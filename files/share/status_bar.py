@@ -9,8 +9,9 @@ gi.require_version('Rsvg', '2.0'); gi.require_version('PangoCairo', '1.0')
 from gi.repository import Gio, GLib, Pango, PangoCairo, Rsvg
 
 OUT = os.path.join(os.environ.get('XDG_RUNTIME_DIR', '/tmp'), 'status-icons')
-ICONS = [os.path.expanduser('~/.icons/Qogir-Dark/symbolic/status'),
-         '/usr/share/icons/Adwaita/symbolic/status']
+# Adwaita's filled, rounded symbolic icons stay soft at 16 px; Qogir's thin outlines look jagged
+ICONS = ['/usr/share/icons/Adwaita/symbolic/status',
+         os.path.expanduser('~/.icons/Qogir-Dark/symbolic/status')]
 HEIGHT, ICON, GAP = 24, 16, 13
 WHITE = (0.91, 0.93, 0.98)
 RED = (0xf7 / 255, 0x76 / 255, 0x8e / 255)
@@ -160,22 +161,28 @@ class StatusBar:
         cr.mask_surface(mask, x, y)
 
     def draw_battery(self, cr, x, cy, level, status):
-        w, h, r = 22, 11, 3
+        w, h, r = 22, 11, 3.5
         y = cy - h / 2
         cr.new_sub_path()
         for ax, ay, a0 in ((x + w - r, y + r, -math.pi / 2), (x + w - r, y + h - r, 0),
                            (x + r, y + h - r, math.pi / 2), (x + r, y + r, math.pi)):
             cr.arc(ax, ay, r, a0, a0 + math.pi / 2)
         cr.close_path()
-        cr.set_source_rgba(*WHITE, 0.45)
-        cr.set_line_width(1.2)
+        cr.set_source_rgba(*WHITE, 0.5)
+        cr.set_line_width(1.5)
         cr.stroke()
-        cr.rectangle(x + w + 1, cy - 2, 1.6, 4)
+        cr.arc(x + w + 1.2, cy, 2, -math.pi / 2, math.pi / 2)
         cr.fill()
         fill = GREEN if status == 'Charging' else RED if level <= 20 else WHITE
-        inner = max(1.5, (w - 4) * min(level, 100) / 100)
+        inner = max(3.6, (w - 5) * min(level, 100) / 100)
         cr.set_source_rgb(*fill)
-        cr.rectangle(x + 2, y + 2, inner, h - 4)
+        ir = 1.8
+        cr.new_sub_path()
+        cr.arc(x + 2.5 + inner - ir, y + 2.5 + ir, ir, -math.pi / 2, 0)
+        cr.arc(x + 2.5 + inner - ir, y + h - 2.5 - ir, ir, 0, math.pi / 2)
+        cr.arc(x + 2.5 + ir, y + h - 2.5 - ir, ir, math.pi / 2, math.pi)
+        cr.arc(x + 2.5 + ir, y + 2.5 + ir, ir, math.pi, 3 * math.pi / 2)
+        cr.close_path()
         cr.fill()
 
     def write(self, name, data):
