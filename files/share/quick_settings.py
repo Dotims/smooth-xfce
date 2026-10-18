@@ -6,6 +6,7 @@ import os
 import re
 
 from popup import Popup, label, run
+from status_bar import StatusBar
 from gi.repository import Gio, GLib, Gtk
 
 NIGHT_CFG = os.path.expanduser('~/.config/night-shift.json')
@@ -213,6 +214,7 @@ class QuickSettings(Popup):
         card.pack_start(self.revealer, False, False, 0)
         self.list_kind = None
         self.night_cfg = {'temp': 4500, 'on': False}
+        self.status = StatusBar()
 
     def launch(self, cmd):
         self.close()

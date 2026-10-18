@@ -106,6 +106,7 @@
       <property name="use-label" type="bool" value="false"/>
       <property name="enable-single-row" type="bool" value="true"/>
       <property name="font" type="string" value="Inter SemiBold 9.5"/>
+      <property name="text" type="string" value="(genmon)"/>
     </property>
   </property>
 </channel>
