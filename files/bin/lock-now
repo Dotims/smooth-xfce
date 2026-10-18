@@ -1,7 +1,8 @@
 #!/bin/sh
-# Lock the screen; typing shows a password prompt with dots.
+# Lock the screen: live clock, typing shows a password field with dots (lockscreen.py).
 pgrep -x xsecurelock >/dev/null && exit 0
-export XSECURELOCK_SAVER="$HOME/.local/bin/lock-saver"
+export XSECURELOCK_SAVER="$HOME/.local/libexec/xsecurelock/saver_glass"
+export XSECURELOCK_AUTH="$HOME/.local/libexec/xsecurelock/auth_glass"
 export XSECURELOCK_PASSWORD_PROMPT=asterisks
 export XSECURELOCK_DISCARD_FIRST_KEYPRESS=0
 export XSECURELOCK_SHOW_DATETIME=1

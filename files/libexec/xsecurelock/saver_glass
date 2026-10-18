@@ -1,0 +1,3 @@
+#!/bin/sh
+# xsecurelock saver: idle lock screen with a live clock.
+exec python3 "$HOME/.local/share/desktop-look/lockscreen.py" saver

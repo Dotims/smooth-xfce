@@ -1,0 +1,3 @@
+#!/bin/sh
+# xsecurelock auth module: the glass password prompt (falls back to auth_x11 on errors).
+exec python3 "$HOME/.local/share/desktop-look/lockscreen.py" auth
