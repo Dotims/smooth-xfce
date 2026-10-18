@@ -5,11 +5,13 @@
 **My Arch Linux desktop, restorable with one script.** A glass panel, blurred and rounded windows,
 a Spotlight-style launcher, gestures and a lock screen, all in the Tokyo Night palette.
 
-<img src="docs/desktop.jpg" alt="XFCE desktop with a terminal, Thunar and the calendar popup">
+<img src="docs/desktop.jpg" alt="XFCE desktop with fastfetch in the terminal, Thunar and quick settings">
 
-| Launcher | Calendar | Lock screen |
-| :---: | :---: | :---: |
-| <img src="docs/launcher.jpg" alt="rofi launcher searching for apps"> | <img src="docs/calendar.jpg" alt="Calendar popup above the clock"> | <img src="docs/lock.jpg" alt="Lock screen card"> |
+| Quick settings | Calendar |
+| :---: | :---: |
+| <img src="docs/quick-settings.jpg" alt="Quick settings popup above the status button"> | <img src="docs/calendar.jpg" alt="Calendar popup above the clock"> |
+| **Lock screen** | **Launcher** |
+| <img src="docs/lock.jpg" alt="Lock screen with a live clock and a password field"> | <img src="docs/launcher.jpg" alt="rofi launcher searching for apps"> |
 
 </div>
 
@@ -17,13 +19,20 @@ a Spotlight-style launcher, gestures and a lock screen, all in the Tokyo Night p
 
 - **Windows**: Qogir GTK theme recolored to the terminal navy, matching window frames, picom with
   blur, shadows, rounded corners and open/close animations, dimmed inactive windows.
-- **Panel**: glass bar with a dock (dot indicators, no boxes), the Spotify track, tray icons at one
-  size and an Arch menu button.
+- **Panel**: glass bar with a dock (dot indicators, no boxes), the Spotify track, an Arch menu
+  button and one status button for Wi-Fi, Bluetooth, volume and battery.
+- **Quick settings**: click the status button. Tiles for Wi-Fi, Bluetooth, do not disturb and
+  night light, network and device lists, sliders for volume (with the output picker), warmth and
+  brightness. Volume keys show an on-screen bar.
 - **Calendar**: click the clock. Weeks start on Monday, Polish public holidays are red and the next
-  day off sits at the bottom. Scroll or use the arrows to change the month.
+  day off sits at the bottom.
+- **Lock screen**: a live clock and a password field with dots, drawn by a small
+  [xsecurelock](https://github.com/google/xsecurelock) module. PAM still checks the password, and
+  any error in the module switches back to the stock prompt.
 - **Launcher**: rofi in a Spotlight style with tabs for apps, windows, files, a calculator and emoji.
-- **Terminal**: xfce4-terminal in Tokyo Night with JetBrains Mono and a Starship prompt.
-- **Lock, login and boot**: xsecurelock card, LightDM greeter, GRUB theme and Plymouth splash.
+- **Terminal**: xfce4-terminal in Tokyo Night with JetBrains Mono, a Starship prompt, fastfetch and
+  btop in the same colors.
+- **Login and boot**: LightDM greeter, GRUB theme and Plymouth splash.
 
 ## Shortcuts
 
@@ -52,12 +61,12 @@ Arch Linux with XFCE 4.20. The script installs the packages, backs up your curre
 git clone https://github.com/Dotims/tokyo-night-xfce.git
 cd tokyo-night-xfce
 ./install.sh            # theme, panel style, launcher, shortcuts, lock screen
-./install.sh --panel    # also replace the whole panel layout
+./install.sh --panel    # also replace the whole panel layout (status button, calendar)
 ./install.sh --boot     # also install the GRUB theme and Plymouth splash
 ```
 
 From the AUR: `bibata-cursor-theme-bin` for the cursor and `skippy-xd-git` for `Super+Tab`.
-Log out and back in once afterwards. The power menu, cheat sheet and calendar are in Polish.
+Log out and back in once afterwards. The popups, lock screen, power menu and cheat sheet are in Polish.
 
 After changing something on the desktop, `./snapshot.sh` copies the current look back into `files/`.
 

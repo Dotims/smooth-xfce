@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Quick settings
+Comment=Panel quick settings, started hidden so it opens instantly
+Exec=@HOME@/.local/bin/quick-settings --daemon
+NoDisplay=true
+StartupNotify=false
+Terminal=false

@@ -110,6 +110,13 @@ xfce4-keyboard-shortcuts|/commands/custom/KP_Delete|pkill -USR2 -x handy
 xfce4-keyboard-shortcuts|/commands/custom/KP_Separator|pkill -USR2 -x handy
 xfce4-keyboard-shortcuts|/commands/custom/Print|flameshot gui
 xfce4-keyboard-shortcuts|/commands/custom/Super_L|xfce4-popup-whiskermenu
+xfce4-keyboard-shortcuts|/commands/custom/XF86AudioLowerVolume|@HOME@/.local/bin/volume down
+xfce4-keyboard-shortcuts|/commands/custom/XF86AudioMicMute|@HOME@/.local/bin/volume mic
+xfce4-keyboard-shortcuts|/commands/custom/XF86AudioMute|@HOME@/.local/bin/volume mute
+xfce4-keyboard-shortcuts|/commands/custom/XF86AudioNext|playerctl next
+xfce4-keyboard-shortcuts|/commands/custom/XF86AudioPlay|playerctl play-pause
+xfce4-keyboard-shortcuts|/commands/custom/XF86AudioPrev|playerctl previous
+xfce4-keyboard-shortcuts|/commands/custom/XF86AudioRaiseVolume|@HOME@/.local/bin/volume up
 xfce4-keyboard-shortcuts|/commands/custom/XF86Display|xfce4-display-settings --minimal
 xfce4-keyboard-shortcuts|/commands/custom/XF86Mail|exo-open --launch MailReader
 xfce4-keyboard-shortcuts|/commands/custom/XF86WWW|exo-open --launch WebBrowser
@@ -183,5 +190,5 @@ xfce4-keyboard-shortcuts|/xfwm4/custom/Left|left_key
 xfce4-keyboard-shortcuts|/xfwm4/custom/Right|right_key
 xfce4-keyboard-shortcuts|/xfwm4/custom/Up|up_key
 xfce4-keyboard-shortcuts|/xfwm4/custom/override|true
-xfce4-panel|/plugins/plugin-16/enable-mpris|true
-xfce4-panel|/plugins/plugin-16/enable-multimedia-keys|true
+xfce4-panel|/plugins/plugin-16/enable-mpris|
+xfce4-panel|/plugins/plugin-16/enable-multimedia-keys|

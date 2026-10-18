@@ -1,0 +1,29 @@
+#!/bin/bash
+# genmon: Wi-Fi, Bluetooth, volume and battery as one button; click opens quick settings.
+GAP=$'\u2002\u2002'  # en spaces; plain spaces get collapsed
+icon() { printf "<span font_family='JetBrainsMono Nerd Font Propo' size='14pt' rise='-1000'>%s</span>" "$1"; }
+
+q=$(awk 'NR>2 {print int($3)}' /proc/net/wireless 2>/dev/null | head -1)
+if [ -z "$q" ]; then wifi=$'\U000f05aa'
+else wifi=($'\U000f092f' $'\U000f091f' $'\U000f0922' $'\U000f0925' $'\U000f0928'); wifi=${wifi[$(( q >= 70 ? 4 : q * 5 / 70 ))]}; fi
+
+bt=""
+bluetoothctl devices Connected 2>/dev/null | grep -q '^Device ' && bt="$(icon $'\U000f00b1')$GAP"
+
+vol=$(pactl get-sink-volume @DEFAULT_SINK@ 2>/dev/null | grep -o '[0-9]*%' | head -1 | tr -d %)
+if pactl get-sink-mute @DEFAULT_SINK@ 2>/dev/null | grep -q yes; then v=$'\U000f075f'
+elif [ "${vol:-0}" -lt 34 ]; then v=$'\U000f057f'
+elif [ "$vol" -lt 67 ]; then v=$'\U000f0580'
+else v=$'\U000f057e'; fi
+
+bat=""; tip="Głośność ${vol:-?}%"
+if [ -r /sys/class/power_supply/BAT0/capacity ]; then
+  cap=$(cat /sys/class/power_supply/BAT0/capacity); st=$(cat /sys/class/power_supply/BAT0/status)
+  if [ "$st" = Charging ]; then b=$'\U000f0084'
+  else lv=($'\U000f007a' $'\U000f007b' $'\U000f007c' $'\U000f007d' $'\U000f007e' $'\U000f007f' $'\U000f0080' $'\U000f0081' $'\U000f0082' $'\U000f0079'); b=${lv[$(( cap >= 100 ? 9 : cap / 10 ))]}; fi
+  bat="$GAP$(icon "$b") ${cap}%"; tip="$tip · bateria ${cap}%"
+fi
+
+echo "<txt>$(icon "$wifi")$GAP${bt}$(icon "$v")${bat}</txt>"
+echo "<txtclick>$HOME/.local/bin/quick-settings</txtclick>"
+echo "<tool>$tip</tool>"

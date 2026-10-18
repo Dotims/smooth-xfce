@@ -22,10 +22,8 @@
         <value type="int" value="2"/>
         <value type="int" value="3"/>
         <value type="int" value="23"/>
-        <value type="int" value="18"/>
         <value type="int" value="6"/>
-        <value type="int" value="21"/>
-        <value type="int" value="16"/>
+        <value type="int" value="24"/>
         <value type="int" value="7"/>
         <value type="int" value="8"/>
         <value type="int" value="20"/>
@@ -40,6 +38,16 @@
     <property name="plugin-6" type="string" value="systray">
       <property name="square-icons" type="bool" value="true"/>
       <property name="icon-size" type="int" value="22"/>
+      <property name="hidden-legacy-items" type="array">
+        <value type="string" value="clipman"/>
+        <value type="string" value="pamac-tray"/>
+        <value type="string" value="system-config-printer"/>
+        <value type="string" value="steam"/>
+      </property>
+      <property name="hidden-items" type="array">
+        <value type="string" value="nm-applet"/>
+        <value type="string" value="blueman"/>
+      </property>
     </property>
     <property name="plugin-8" type="string" value="clock">
       <property name="timezone" type="string" value="Europe/Warsaw"/>
@@ -73,13 +81,6 @@
       <property name="expand" type="bool" value="false"/>
       <property name="style" type="uint" value="0"/>
     </property>
-    <property name="plugin-16" type="string" value="pulseaudio">
-      <property name="enable-keyboard-shortcuts" type="bool" value="true"/>
-      <property name="known-players" type="string" value="Brave;Chrome;Chromium;firefox;spotify"/>
-      <property name="enable-mpris" type="bool" value="true"/>
-      <property name="enable-multimedia-keys" type="bool" value="true"/>
-    </property>
-    <property name="plugin-18" type="string" value="night-shift"/>
     <property name="plugin-20" type="string" value="separator">
       <property name="style" type="uint" value="0"/>
     </property>
@@ -91,7 +92,6 @@
         <property name="paste-on-activate" type="uint" value="2"/>
       </property>
     </property>
-    <property name="plugin-21" type="string" value="power-manager-plugin"/>
     <property name="plugin-23" type="string" value="genmon">
       <property name="command" type="string" value="@HOME@/.local/bin/now-playing"/>
       <property name="use-label" type="bool" value="false"/>
@@ -99,6 +99,13 @@
       <property name="enable-single-row" type="bool" value="true"/>
       <property name="font" type="string" value="Inter 9.5"/>
       <property name="text" type="string" value="(genmon)"/>
+    </property>
+    <property name="plugin-24" type="string" value="genmon">
+      <property name="command" type="string" value="@HOME@/.local/bin/status-icons"/>
+      <property name="update-period" type="int" value="2000"/>
+      <property name="use-label" type="bool" value="false"/>
+      <property name="enable-single-row" type="bool" value="true"/>
+      <property name="font" type="string" value="Inter SemiBold 9.5"/>
     </property>
   </property>
 </channel>

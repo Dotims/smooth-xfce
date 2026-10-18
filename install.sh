@@ -15,7 +15,8 @@ grep -rIl '@HOME@' "$F" | xargs -r sed -i "s|@HOME@|$HOME|g"
 echo "==> packages"
 sudo pacman -S --needed --noconfirm picom rofi starship xsecurelock mpv inter-font \
   ttf-jetbrains-mono-nerd papirus-icon-theme xfce4-docklike-plugin python-pillow xdotool plymouth \
-  touchegg rofi-emoji rofi-calc playerctl wmctrl clipmenu xfce4-genmon-plugin xclip python-gobject
+  touchegg rofi-emoji rofi-calc playerctl wmctrl clipmenu xfce4-genmon-plugin xclip python-gobject python-cairo \
+  fastfetch btop brightnessctl redshift
 pacman -Q bibata-cursor-theme-bin >/dev/null 2>&1 || pacman -Q bibata-cursor-theme >/dev/null 2>&1 || \
   echo "!! install bibata-cursor-theme-bin from AUR for the cursor"
 
@@ -35,6 +36,7 @@ cp -a "$F/bin/." "$HOME/.local/bin/"
 cp -a "$F/wallpapers/." "$HOME/Pictures/Wallpapers/"
 mkdir -p "$HOME/.local/share/desktop-look" && cp -a "$F/share/." "$HOME/.local/share/desktop-look/"
 mkdir -p "$HOME/.local/share/icons" && cp -a "$F/icons/." "$HOME/.local/share/icons/"
+mkdir -p "$HOME/.local/libexec" && cp -a "$F/libexec/." "$HOME/.local/libexec/"
 if [ ! -d "$HOME/.icons/Qogir-Dark" ] && [ ! -d /usr/share/icons/Qogir-Dark ]; then
   echo "==> Qogir icons (github)"
   T=$(mktemp -d) && git clone -q --depth 1 https://github.com/vinceliuice/Qogir-icon-theme "$T/q" && \
@@ -89,9 +91,12 @@ fi
 echo "==> compositor"
 pkill -x picom; sleep 1; setsid picom --config "$HOME/.config/picom/picom.conf" >/dev/null 2>&1 < /dev/null &
 
-echo "==> calendar popup, screenshot daemon"
-pkill -f '^python3 [^ ]*desktop-look/calendar.py'; sleep 0.5
+echo "==> panel popups, tray agents, screenshot daemon"
+pkill -f '^python3 [^ ]*desktop-look/(calendar_popup|quick_settings).py'; sleep 0.5
 setsid "$HOME/.local/bin/calendar-popup" --daemon >/dev/null 2>&1 < /dev/null &
+setsid "$HOME/.local/bin/quick-settings" --daemon >/dev/null 2>&1 < /dev/null &
+# nm-applet stays as the Wi-Fi password agent, as a hidden status notifier
+pkill -x nm-applet; setsid nm-applet --indicator >/dev/null 2>&1 < /dev/null &
 if pgrep -x flameshot >/dev/null; then pkill -x flameshot; sleep 1; setsid flameshot >/dev/null 2>&1 < /dev/null & fi
 
 if [ -x "$HOME/Applications/Handy.AppImage" ]; then

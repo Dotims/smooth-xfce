@@ -3,7 +3,7 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 F="$HERE/files"
-rm -rf "$F" && mkdir -p "$F"/{config,themes,bin,xfconf,wallpapers,system,icons}
+rm -rf "$F" && mkdir -p "$F"/{config,themes,bin,xfconf,wallpapers,system,icons,libexec}
 
 cp_rel() { mkdir -p "$F/config/$(dirname "$1")"; cp -a "$HOME/.config/$1" "$F/config/$1"; }
 cp_rel gtk-3.0/gtk.css
@@ -19,15 +19,20 @@ cp_rel touchegg/touchegg.conf
 cp_rel systemd/user/clipmenud.service.d/override.conf
 cp_rel autostart/skippy-xd.desktop
 cp_rel autostart/calendar-popup.desktop
+cp_rel autostart/quick-settings.desktop
+cp_rel autostart/nm-applet.desktop
+cp_rel fastfetch/config.jsonc
+cp_rel btop/btop.conf
 cp_rel flameshot/flameshot.ini
 
 tar -C "$HOME/.themes" -czf "$F/themes/themes.tar.gz" Qogir-Dark Qogir-Dark-Night Night-Glass
 cp -a "$HOME/.icons/default/index.theme" "$F/themes/cursor-index.theme"
 
-for b in lock-now lock-saver lock-bg-make handy-mono-tray ws grid-windows clipboard-menu rofi-power now-playing cheatsheet calendar-popup; do cp -a "$HOME/.local/bin/$b" "$F/bin/"; done
+for b in lock-now lock-saver lock-bg-make handy-mono-tray ws grid-windows clipboard-menu rofi-power now-playing cheatsheet calendar-popup quick-settings status-icons volume; do cp -a "$HOME/.local/bin/$b" "$F/bin/"; done
 cp -a "$HOME"/Pictures/Wallpapers/* "$F/wallpapers/"
 mkdir -p "$F/share" && cp -a "$HOME"/.local/share/desktop-look/*.py "$F/share/"
 cp -a "$HOME/.local/share/icons/arch-menu.svg" "$F/icons/"
+cp -a "$HOME/.local/libexec/xsecurelock" "$F/libexec/"
 cp -a /etc/lightdm/lightdm-gtk-greeter.conf "$F/system/"
 cp -a /usr/share/backgrounds/radek/login-bg.png "$F/system/"
 tar -C /boot/grub/themes -czf "$F/system/grub-theme.tar.gz" tokyo-night-radek

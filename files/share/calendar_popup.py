@@ -2,13 +2,10 @@
 # Clock popup: month grid from Monday, Polish public holidays in red, the next day off.
 # Stays running hidden; `calendar-popup` toggles it over D-Bus so it opens instantly.
 import datetime as dt
-import sys
 
-import gi
-gi.require_version('Gtk', '3.0'); gi.require_version('Gdk', '3.0')
-from gi.repository import Gdk, Gio, GLib, Gtk
+from popup import Popup, label, run
+from gi.repository import Gdk, Gtk
 
-APP_ID = 'dev.dotims.Calendar'
 MONTHS = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec', 'lipiec', 'sierpień',
           'wrzesień', 'październik', 'listopad', 'grudzień']
 MONTHS_OF = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia',
@@ -16,16 +13,7 @@ MONTHS_OF = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipc
 WEEKDAYS = ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela']
 DAY_LABELS = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd']
 
-CSS = b"""
-window { background-color: transparent; }
-.card {
-  background-color: rgba(26, 27, 38, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  border-radius: 12px;
-  padding: 16px 18px 14px;
-}
-label { font-family: Inter; color: #c0caf5; }
-.weekday { color: #7aa2f7; font-size: 10pt; font-weight: 600; }
+CSS = b""".weekday { color: #7aa2f7; font-size: 10pt; font-weight: 600; }
 .week { color: #565f89; font-size: 9pt; }
 .date { font-size: 19pt; font-weight: 600; }
 .month { font-size: 11pt; font-weight: 600; }
@@ -90,47 +78,16 @@ def in_days(n):
     return 'dziś' if n == 0 else 'jutro' if n == 1 else f'za {n} dni'
 
 
-class Calendar(Gtk.Application):
+class Calendar(Popup):
+    APP_ID = 'dev.dotims.Calendar'
+    CSS = CSS
+
     def __init__(self, hidden):
-        super().__init__(application_id=APP_ID)
-        self.hidden = hidden
-        self.win = None
+        super().__init__(hidden)
         self.shown = dt.date.today().replace(day=1)
         self.scroll = 0.0
 
-    def do_startup(self):
-        Gtk.Application.do_startup(self)
-        self.hold()
-        css = Gtk.CssProvider(); css.load_from_data(CSS)
-        Gtk.StyleContext.add_provider_for_screen(
-            Gdk.Screen.get_default(), css, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
-        self.build()
-
-    def do_activate(self):
-        if self.hidden:
-            self.hidden = False
-        elif self.win.get_visible():
-            self.close()
-        else:
-            self.open()
-
-    def build(self):
-        w = self.win = Gtk.Window(type=Gtk.WindowType.POPUP)
-        w.set_type_hint(Gdk.WindowTypeHint.POPUP_MENU)
-        w.set_visual(w.get_screen().get_rgba_visual())
-        w.set_app_paintable(True)
-        w.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.SCROLL_MASK
-                     | Gdk.EventMask.SMOOTH_SCROLL_MASK | Gdk.EventMask.KEY_PRESS_MASK)
-        w.connect('button-press-event', self.on_press)
-        w.connect('key-press-event', self.on_key)
-        w.connect('scroll-event', self.on_scroll)
-        w.connect('grab-broken-event', lambda *_: self.close())
-        self.add_window(w)
-
-        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        card.get_style_context().add_class('card')
-        w.add(card)
-
+    def build(self, card):
         top = Gtk.Box(spacing=8)
         self.weekday = self.label('weekday', xalign=0)
         self.week = self.label('week', xalign=1)
@@ -180,12 +137,9 @@ class Calendar(Gtk.Application):
         text.pack_start(self.hname, False, False, 0); text.pack_start(self.hwhen, False, False, 0)
         foot.pack_start(dot, False, False, 0); foot.pack_start(text, True, True, 0)
         card.pack_start(foot, False, False, 0)
-        card.show_all()
 
     def label(self, cls, text='', **props):
-        lab = Gtk.Label(label=text, **props)
-        lab.get_style_context().add_class(cls)
-        return lab
+        return label(cls, text, **props)
 
     def button(self, child, cb):
         b = Gtk.Button(relief=Gtk.ReliefStyle.NONE, can_focus=False)
@@ -232,44 +186,12 @@ class Calendar(Gtk.Application):
             self.shown = dt.date(y, m + 1, 1)
         self.fill()
 
-    def open(self):
+    def refresh(self):
         self.shown = dt.date.today().replace(day=1)
         self.fill()
-        w = self.win
-        w.resize(1, 1)
-        _, size = w.get_preferred_size()
-        display = Gdk.Display.get_default()
-        _, px, py = display.get_default_seat().get_pointer().get_position()
-        area = display.get_monitor_at_point(px, py).get_workarea()
-        w.move(area.x + area.width - size.width - 10, area.y + area.height - size.height - 10)
-        w.show()
-        GLib.timeout_add(30, self.grab, 10)
 
-    def grab(self, tries):
-        gw = self.win.get_window()
-        if not self.win.get_visible() or gw is None:
-            return False
-        seat = Gdk.Display.get_default().get_default_seat()
-        status = seat.grab(gw, Gdk.SeatCapabilities.ALL, True, None, None, None, None)
-        if status != Gdk.GrabStatus.SUCCESS and tries > 0:
-            GLib.timeout_add(30, self.grab, tries - 1)
-        return False
-
-    def close(self):
-        Gdk.Display.get_default().get_default_seat().ungrab()
-        self.win.hide()
-
-    def on_press(self, w, ev):
-        alloc = w.get_allocation()
-        if not (0 <= ev.x < alloc.width and 0 <= ev.y < alloc.height):
-            self.close()
-        return False
-
-    def on_key(self, w, ev):
-        key = ev.keyval
-        if key == Gdk.KEY_Escape:
-            self.close()
-        elif key in (Gdk.KEY_Left, Gdk.KEY_Page_Up):
+    def on_key(self, key):
+        if key in (Gdk.KEY_Left, Gdk.KEY_Page_Up):
             self.go(-1)
         elif key in (Gdk.KEY_Right, Gdk.KEY_Page_Down):
             self.go(1)
@@ -277,7 +199,7 @@ class Calendar(Gtk.Application):
             self.go(None)
         return True
 
-    def on_scroll(self, w, ev):
+    def on_scroll(self, ev):
         if ev.direction == Gdk.ScrollDirection.SMOOTH:
             # touchpads send small deltas; flip a month per full notch
             self.scroll += ev.delta_y
@@ -290,11 +212,4 @@ class Calendar(Gtk.Application):
 
 
 if __name__ == '__main__':
-    GLib.set_prgname('calendar-popup')
-    Gdk.set_program_class('Calendar-popup')
-    hidden = '--daemon' in sys.argv
-    app = Calendar(hidden)
-    app.register(None)
-    if hidden and app.get_is_remote():
-        sys.exit(0)
-    sys.exit(app.run([sys.argv[0]]))
+    run(Calendar, 'calendar-popup')

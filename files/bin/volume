@@ -1,0 +1,22 @@
+#!/bin/bash
+# Volume and mic keys with an on-screen bar (the pulseaudio panel plugin used to do this).
+case $1 in
+  up)   pactl set-sink-mute @DEFAULT_SINK@ 0; pactl set-sink-volume @DEFAULT_SINK@ +5% ;;
+  down) pactl set-sink-volume @DEFAULT_SINK@ -5% ;;
+  mute) pactl set-sink-mute @DEFAULT_SINK@ toggle ;;
+  mic)  pactl set-source-mute @DEFAULT_SOURCE@ toggle ;;
+esac
+vol=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1 | tr -d %)
+[ "${vol:-0}" -gt 100 ] && pactl set-sink-volume @DEFAULT_SINK@ 100% && vol=100
+if [ "$1" = mic ]; then
+  pactl get-source-mute @DEFAULT_SOURCE@ | grep -q yes && body="Mikrofon wyciszony" || body="Mikrofon włączony"
+  icon=microphone-sensitivity-high-symbolic; title=Mikrofon; hint=()
+else
+  pactl get-sink-mute @DEFAULT_SINK@ | grep -q yes && { icon=audio-volume-muted-symbolic; body="Wyciszono"; } \
+    || { icon=audio-volume-high-symbolic; body="$vol%"; }
+  title="Głośność"; hint=(-h "int:value:$vol")
+fi
+# reuse one notification so repeated presses update the same bar
+idf="${XDG_RUNTIME_DIR:-/tmp}/volume-osd.id"
+id=$(cat "$idf" 2>/dev/null)
+notify-send -a "$title" -i "$icon" -t 1500 "${hint[@]}" ${id:+-r "$id"} -p "$title" "$body" > "$idf"
