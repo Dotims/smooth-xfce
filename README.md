@@ -1,9 +1,10 @@
 <div align="center">
 
-# Tokyo Night XFCE
+# Smooth XFCE
 
-**My Arch Linux desktop, restorable with one script.** A glass panel, blurred and rounded windows,
-a Spotlight-style launcher, gestures and a lock screen, all in the Tokyo Night palette.
+**A smooth, glassy XFCE desktop for Arch Linux, restorable with one script.** Blurred and
+rounded windows with animations, a Spotlight-style launcher, quick settings, gestures and a lock
+screen, all in the Tokyo Night palette.
 
 <img src="docs/desktop.jpg" alt="XFCE desktop with fastfetch in the terminal, Thunar and quick settings">
 
@@ -58,8 +59,8 @@ Arch Linux with XFCE 4.20. The script installs the packages, backs up your curre
 `~/.config/desktop-look-backup-*` and then applies everything.
 
 ```sh
-git clone https://github.com/Dotims/tokyo-night-xfce.git
-cd tokyo-night-xfce
+git clone https://github.com/Dotims/smooth-xfce.git
+cd smooth-xfce
 ./install.sh            # theme, panel style, launcher, shortcuts, lock screen
 ./install.sh --panel    # also replace the whole panel layout (status button, calendar)
 ./install.sh --boot     # also install the GRUB theme and Plymouth splash

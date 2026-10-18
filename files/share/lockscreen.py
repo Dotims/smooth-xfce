@@ -361,6 +361,9 @@ class Auth(LockScreen):
 
     def packet(self, kind, msg):
         if kind in ('P', 'U'):
+            # authproto_pam retries a wrong password itself: a new prompt after ours means "wrong"
+            if self.state == 'checking':
+                self.wrong()
             self.prompted = True
             self.send_password()
         elif kind == 'e':
@@ -375,13 +378,18 @@ class Auth(LockScreen):
         if rc == 0:
             self.quit(EXIT_OK)
             return
+        if self.state == 'checking':
+            self.wrong()
+        GLib.timeout_add(400, lambda: (self.start_proto(), False)[1])
+
+    def wrong(self):
         self.state = 'wrong'
         self.chars.clear()
+        self.submitted = False
         if not self.message or self.message[1] != RED:
             self.message = ('Złe hasło, spróbuj jeszcze raz', RED)
         self.shake_start = time.monotonic()
         self.animate(0.5)
-        GLib.timeout_add(400, lambda: (self.start_proto(), False)[1])
 
     def cancel(self):
         if self.proto and self.proto.poll() is None:
