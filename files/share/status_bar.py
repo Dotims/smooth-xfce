@@ -5,18 +5,28 @@ import os
 
 import cairo
 import gi
-gi.require_version('Rsvg', '2.0'); gi.require_version('PangoCairo', '1.0')
+gi.require_version('Rsvg', '2.0'); gi.require_version('Pango', '1.0'); gi.require_version('PangoCairo', '1.0')
 from gi.repository import Gio, GLib, Pango, PangoCairo, Rsvg
 
 OUT = os.path.join(os.environ.get('XDG_RUNTIME_DIR', '/tmp'), 'status-icons')
 # Adwaita's filled, rounded symbolic icons stay soft at 16 px; Qogir's thin outlines look jagged
 ICONS = ['/usr/share/icons/Adwaita/symbolic/status',
          os.path.expanduser('~/.icons/Qogir-Dark/symbolic/status')]
-HEIGHT, ICON, GAP = 24, 16, 13
+HEIGHT, ICON, GAP, BW = 24, 16, 13, 29
 WHITE = (0.91, 0.93, 0.98)
 RED = (0xf7 / 255, 0x76 / 255, 0x8e / 255)
 GREEN = (0x9e / 255, 0xce / 255, 0x6a / 255)
+NAVY = (0x10 / 255, 0x11 / 255, 0x18 / 255)
 BAT = '/sys/class/power_supply/BAT0'
+
+
+def rounded(cr, x, y, w, h, r):
+    cr.new_sub_path()
+    cr.arc(x + w - r, y + r, r, -math.pi / 2, 0)
+    cr.arc(x + w - r, y + h - r, r, 0, math.pi / 2)
+    cr.arc(x + r, y + h - r, r, math.pi / 2, math.pi)
+    cr.arc(x + r, y + r, r, math.pi, 3 * math.pi / 2)
+    cr.close_path()
 
 
 def icon_path(name):
@@ -115,22 +125,7 @@ class StatusBar:
 
     def render(self, wifi, bt, sound, battery):
         items = [wifi] + (['bluetooth-active-symbolic'] if bt else []) + [sound]
-        pct_layout = None
-        width = len(items) * ICON + (len(items) - 1) * GAP
-        if battery:
-            tmp = cairo.Context(cairo.ImageSurface(cairo.FORMAT_ARGB32, 1, 1))
-            # grey antialiasing: subpixel colour fringes show on a transparent image
-            fo = cairo.FontOptions()
-            fo.set_antialias(cairo.ANTIALIAS_GRAY)
-            PangoCairo.context_set_font_options(PangoCairo.create_context(tmp), fo)
-            pct_layout = PangoCairo.create_layout(tmp)
-            PangoCairo.context_set_font_options(pct_layout.get_context(), fo)
-            pct_layout.context_changed()
-            desc = Pango.FontDescription('Inter Medium')
-            desc.set_absolute_size(12 * Pango.SCALE)
-            pct_layout.set_font_description(desc)
-            pct_layout.set_text(f'{battery[0]}%', -1)
-            width += GAP + 25 + 5 + pct_layout.get_pixel_size()[0]
+        width = len(items) * ICON + (len(items) - 1) * GAP + (GAP + BW + 4 if battery else 0)
         surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, HEIGHT)
         cr = cairo.Context(surf)
         x = 0
@@ -139,10 +134,6 @@ class StatusBar:
             x += ICON + GAP
         if battery:
             self.draw_battery(cr, x, HEIGHT / 2, *battery)
-            cr.set_source_rgb(*WHITE)
-            _, th = pct_layout.get_pixel_size()
-            cr.move_to(x + 25 + 5, (HEIGHT - th) / 2)
-            PangoCairo.show_layout(cr, pct_layout)
         tmp = os.path.join(OUT, 'icons.png.tmp')
         surf.write_to_png(tmp)
         os.replace(tmp, os.path.join(OUT, 'icons.png'))
@@ -161,29 +152,36 @@ class StatusBar:
         cr.mask_surface(mask, x, y)
 
     def draw_battery(self, cr, x, cy, level, status):
-        w, h, r = 22, 11, 3.5
+        # iOS style: the level fills the body and the percentage sits inside it
+        h, r = 14, 4.5
         y = cy - h / 2
-        cr.new_sub_path()
-        for ax, ay, a0 in ((x + w - r, y + r, -math.pi / 2), (x + w - r, y + h - r, 0),
-                           (x + r, y + h - r, math.pi / 2), (x + r, y + r, math.pi)):
-            cr.arc(ax, ay, r, a0, a0 + math.pi / 2)
-        cr.close_path()
-        cr.set_source_rgba(*WHITE, 0.5)
-        cr.set_line_width(1.5)
-        cr.stroke()
-        cr.arc(x + w + 1.2, cy, 2, -math.pi / 2, math.pi / 2)
+        rounded(cr, x, y, BW, h, r)
+        cr.set_source_rgba(*WHITE, 0.35)
         cr.fill()
         fill = GREEN if status == 'Charging' else RED if level <= 20 else WHITE
-        inner = max(3.6, (w - 5) * min(level, 100) / 100)
+        cr.save()
+        rounded(cr, x, y, BW, h, r)
+        cr.clip()
+        cr.rectangle(x, y, BW * min(level, 100) / 100, h)
         cr.set_source_rgb(*fill)
-        ir = 1.8
-        cr.new_sub_path()
-        cr.arc(x + 2.5 + inner - ir, y + 2.5 + ir, ir, -math.pi / 2, 0)
-        cr.arc(x + 2.5 + inner - ir, y + h - 2.5 - ir, ir, 0, math.pi / 2)
-        cr.arc(x + 2.5 + ir, y + h - 2.5 - ir, ir, math.pi / 2, math.pi)
-        cr.arc(x + 2.5 + ir, y + 2.5 + ir, ir, math.pi, 3 * math.pi / 2)
-        cr.close_path()
         cr.fill()
+        cr.restore()
+        cr.arc(x + BW + 1.6, cy, 2.2, -math.pi / 2, math.pi / 2)
+        cr.set_source_rgba(*WHITE, 0.45)
+        cr.fill()
+        layout = PangoCairo.create_layout(cr)
+        fo = cairo.FontOptions()
+        fo.set_antialias(cairo.ANTIALIAS_GRAY)  # subpixel colour fringes show on a transparent image
+        PangoCairo.context_set_font_options(layout.get_context(), fo)
+        layout.context_changed()
+        desc = Pango.FontDescription('Inter SemiBold')
+        desc.set_absolute_size(10.5 * Pango.SCALE)
+        layout.set_font_description(desc)
+        layout.set_text(str(level), -1)
+        tw, th = layout.get_pixel_size()
+        cr.set_source_rgb(*NAVY)
+        cr.move_to(x + (BW - tw) / 2, cy - th / 2 + 0.5)
+        PangoCairo.show_layout(cr, layout)
 
     def write(self, name, data):
         tmp = os.path.join(OUT, name + '.tmp')
