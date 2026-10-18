@@ -6,13 +6,13 @@
 rounded windows with animations, a Spotlight-style launcher, quick settings, gestures and a lock
 screen, all in the Tokyo Night palette.
 
-<img src="docs/desktop.jpg" alt="XFCE desktop with fastfetch in the terminal, Thunar and quick settings">
+<img src="docs/demo.gif" alt="Tour: launcher, terminal, Alt+Tab, window overview, quick settings, calendar, workspaces and the lock screen">
 
-| Quick settings | Calendar |
+| Desktop | Quick settings |
 | :---: | :---: |
-| <img src="docs/quick-settings.jpg" alt="Quick settings popup above the status button"> | <img src="docs/calendar.jpg" alt="Calendar popup above the clock"> |
-| **Lock screen** | **Launcher** |
-| <img src="docs/lock.jpg" alt="Lock screen with a live clock and a password field"> | <img src="docs/launcher.jpg" alt="rofi launcher searching for apps"> |
+| <img src="docs/desktop.jpg" alt="XFCE desktop with fastfetch in the terminal, Thunar and quick settings"> | <img src="docs/quick-settings.jpg" alt="Quick settings popup above the status button"> |
+| **Calendar** | **Lock screen** |
+| <img src="docs/calendar.jpg" alt="Calendar popup above the clock"> | <img src="docs/lock.jpg" alt="Lock screen with a live clock and a password field"> |
 
 </div>
 
