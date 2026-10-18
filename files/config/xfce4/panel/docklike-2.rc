@@ -1,0 +1,16 @@
+[user]
+pinned=discord;google-chrome;spotify;antigravity;code;brave-browser;thunar;firefox;slack;signal;xfce4-terminal;arctis-eq;
+middleButtonBehavior=1
+onlyDisplayScreen=false
+showPreviews=false
+showWindowCount=true
+indicatorStyle=1
+indicatorColorFromTheme=false
+forceIconSize=false
+keyComboActive=false
+indicatorOrientation=0
+noWindowsListIfSingle=false
+onlyDisplayVisible=false
+inactiveIndicatorStyle=1
+indicatorColor=rgb(122,162,247)
+inactiveColor=rgba(255,255,255,0.45)

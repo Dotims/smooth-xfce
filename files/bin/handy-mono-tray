@@ -1,0 +1,13 @@
+#!/bin/bash
+# Unpacks Handy.AppImage to ~/Applications/Handy-app with a white idle tray icon
+# (Handy on Linux shows its pink brand icon). Re-run after updating Handy.AppImage.
+set -e
+SRC=~/Applications/Handy.AppImage
+DST=~/Applications/Handy-app
+TMP=$(mktemp -d)
+cd "$TMP" && "$SRC" --appimage-extract >/dev/null
+RES=squashfs-root/usr/lib/Handy/resources
+cp "$RES/tray_idle.png" "$RES/handy.png"
+cp "$RES/tray_idle_warning.png" "$RES/handy_warning.png"
+rm -rf "$DST" && mv squashfs-root "$DST" && rm -rf "$TMP"
+echo "ok: $DST/AppRun"

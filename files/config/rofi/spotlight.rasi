@@ -1,0 +1,44 @@
+/* Spotlight-like launcher in the panel/terminal palette (2026-10-16) */
+* {
+  bg:        rgba(26, 27, 38, 0.86);
+  bg-alt:    rgba(255, 255, 255, 0.06);
+  fg:        #c0caf5;
+  fg-dim:    #737aa2;
+  accent:    #7aa2f7;
+  sel:       rgba(122, 162, 247, 0.18);
+  border-c:  rgba(255, 255, 255, 0.10);
+  font: "Inter 12";
+  background-color: transparent;
+  text-color: @fg;
+  margin: 0; padding: 0; spacing: 0;
+}
+window {
+  location: north;
+  y-offset: 22%;
+  width: 640px;
+  background-color: @bg;
+  border: 1px;
+  border-color: @border-c;
+  border-radius: 16px;
+}
+mainbox { padding: 12px; spacing: 10px; children: [ inputbar, message, listview, mode-switcher ]; }
+inputbar {
+  padding: 12px 14px;
+  spacing: 12px;
+  background-color: @bg-alt;
+  border-radius: 11px;
+  children: [ icon-search, entry ];
+}
+icon-search { expand: false; filename: "system-search-symbolic"; size: 20px; vertical-align: 0.5; }
+entry { font: "Inter 15"; placeholder: "Szukaj"; placeholder-color: @fg-dim; vertical-align: 0.5; cursor: text; }
+listview { lines: 7; columns: 1; fixed-height: false; scrollbar: false; spacing: 2px; }
+element { padding: 8px 10px; spacing: 12px; border-radius: 10px; }
+element selected.normal, element selected.active { background-color: @sel; }
+element-icon { size: 28px; vertical-align: 0.5; }
+element-text { vertical-align: 0.5; highlight: bold #7aa2f7; }
+element normal.active, element alternate.active { text-color: @accent; }
+mode-switcher { spacing: 6px; }
+button { padding: 6px 10px; border-radius: 8px; text-color: @fg-dim; font: "Inter 10"; }
+button selected { background-color: @bg-alt; text-color: @fg; }
+message { padding: 8px 12px; border-radius: 10px; background-color: @bg-alt; }
+textbox { text-color: @fg; }

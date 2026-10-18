@@ -1,0 +1,529 @@
+/* 
+    Title   : gtk.css dark mode
+    Author  : lsteam(linuxscoop team)
+    Youtube : https://youtube.com/c/linuxscoop
+    Website : https://linuxscoop.com
+*/
+#pulseaudio-button image { -gtk-icon-transform: scale(0.44); }
+#xfce4-power-manager-plugin image {-gtk-icon-transform: scale(0.47);}
+#xfce4-notification-plugin image {-gtk-icon-transform: scale(0.43);}
+/* night-shift = bare xfce-panel-button (verified only match on these panels) */
+#xfce-panel-button image { -gtk-icon-transform: scale(0.56); }
+/* Applications (Whisker menu) button icon — slightly smaller */
+#whiskermenu-button image { -gtk-icon-transform: scale(0.88); }
+
+.xfce4-panel.panel {
+  background-color:#32343D; /*color xfce panel*/
+  font-weight: normal;
+  text-shadow: none;
+  -gtk-icon-shadow: none; }
+
+.xfce4-panel.panel menu {
+  font-weight: normal; }
+
+ .xfce4-panel.panel button.flat, .xfce4-panel.panel button.sidebar-button {
+  color: #e6ebef; /*text color xfce panel*/
+  border-radius: 0;
+  border: none;
+  background-color: rgba(50, 52, 61, 0.95) ; } /*button color xfce panel*/
+.xfce4-panel.panel button.flat:hover, .xfce4-panel.panel button.sidebar-button:hover {
+    border: none;
+    background-color: #494c59; } /*button color xfce panel when hover*/
+.xfce4-panel.panel button.flat:active, .xfce4-panel.panel button.sidebar-button:active,.xfce4-panel.panel button.flat:checked, .xfce4-panel.panel button.sidebar-button:checked {
+    /*color: #EFEFEF;*/
+    border: none;
+   /* background-color: #5294e2;*/ }
+.xfce4-panel.panel button.flat:active label, .xfce4-panel.panel button.sidebar-button:active label, .xfce4-panel.panel button.flat:active image, .xfce4-panel.panel button.sidebar-button:active image, .xfce4-panel.panel button.flat:checked label, .xfce4-panel.panel button.sidebar-button:checked label, .xfce4-panel.panel button.flat:checked image, .xfce4-panel.panel button.sidebar-button:checked image
+      /*color: #181818;*/ 
+/* Corrección de color para el menu global */
+
+.-vala-panel-appmenu-private {
+  background-color: transparent;
+  background-image: none;
+  color: #ffffff;
+  box-shadow: inset 0 0px;
+}
+
+.-vala-panel-appmenu-core scrolledwindow,
+.-vala-panel-appmenu-private > menuitem,
+.-vala-panel-appmenu-private > menuitem:first-child > label {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+menubar.-vala-panel-appmenu-bold > menuitem > label {
+color: #EFEFEF;
+}
+menubar.-vala-panel-appmenu-bold > menuitem:first-child > label {
+ font-weight: bolder;
+color: #EFEFEF;
+}
+
+.-vala-panel-appmenu-private > separator {
+  background-color: transparent;
+  background-image: none;
+opacity: 0;
+}
+
+/*
+Whisker Menu
+*/
+
+#whiskermenu-window * {
+  border: 0px rgba(50, 52, 61, 0.95) solid; /*All border*/
+  outline: none;
+}
+#whiskermenu-window {
+  background-color: rgba(50, 52, 61, 0.8) ; /*All window*/
+  color: #e6ebef; /*Text color ex:username*/
+border-radius: 10px 10px 0px 0px;
+}
+
+#whiskermenu-window scrollbar {
+background: transparent;
+}
+#whiskermenu-window entry {
+  background-color: rgba(0, 0, 0, 0.25); /*Searchbox Color*/
+  color: #e6ebef;/*Searchtext Color*/
+}
+
+#whiskermenu-window button {
+    background-color: rgba(50, 52, 61, 0.0); /*Color of Button category*/
+    color: #e6ebef; /*Color of Text button category*/
+    margin:1px;
+    margin-right: 2px;
+    border-radius: 5px;
+    background-image: none;
+}
+
+#whiskermenu-window treeview {
+  background-color: rgba(50, 52, 61, 0.1); /*Box Color of application when click/Hover on category */
+  color: #e6ebef; /*Text Color of application when click/Hover on category */
+  background-image: none;
+  outline-color: rgba(0, 0, 0, 0);
+}
+
+#whiskermenu-window .frame:first-child {
+    background: rgba(50, 52, 61, 0.1); /*First Color Box of favorite/All applications*/
+    border-radius: 8px;
+    }
+
+#whiskermenu-window button:focus,
+#whiskermenu-window button:hover,
+#whiskermenu-window button:active,
+#whiskermenu-window button:selected,
+#whiskermenu-window treeview:selected,
+#whiskermenu-window treeview:hover,
+#whiskermenu-window treeview:active,
+#whiskermenu-window treeview:focus
+{
+  background-color: #5294e2; /*Button Color click/Hover  */
+  color: #ffffff; /*Text Button Color click/Hover  */
+  transition: 200ms;
+  
+}
+#whiskermenu-window button:active {
+background: #2679db; /*Button Color click-active  */
+
+}
+#whiskermenu-window treeview:focus {
+background: transparent;
+}
+#whiskermenu-window iconview{
+background: transparent;
+border-radius: 8px;
+}
+#whiskermenu-window iconview:hover{
+background: rgba(50, 52, 61, 0.25);
+border: 1px rgba(255, 255, 255, 0.25) solid;
+}
+
+#whiskermenu-window iconview{
+background: transparent;
+border-radius: 10px;
+}
+
+
+#whiskermenu-window iconview {
+color: #ffffff; /*text color when icon view mode*/
+}
+
+
+
+/* THUNAR FIXES */
+
+/*
+.thunar toolbar {
+background: #333;
+padding: 4px;
+
+}
+.thunar toolbar button {
+background: #262626;
+border: 1px rgba(255,255,255,0.1) solid;
+margin: 2px;
+box-shadow: 2px 2px 3px transparent;
+
+}
+
+.thunar toolbar button:hover {
+background: #444;
+border: 1px rgba(255,255,255,0.4) solid;
+}
+
+
+.thunar toolbar button image {
+color: #EFEFEF;
+}
+.thunar toolbar button.toggle {
+color: #CCC;
+
+}
+.thunar toolbar button.toggle image:insensitive {
+color: #888;
+}
+.thunar toolbar button:checked {
+color: #FFF;
+background: #181818;
+}
+
+.thunar toolbar .path-bar {
+padding: 10px;
+outline-width: 0;
+}
+
+.thunar toolbar .path-bar-button {
+color: #FFF;
+margin: 0;
+outline-width: 0;
+border: 1px rgba(255,255,255,0) solid;
+}
+
+.thunar treeview.view {
+background: #EFEFEF;
+}
+.thunar treeview.view {
+color: #181818;
+}
+.thunar treeview:backdrop  {
+opacity: 0.5;
+}
+
+window.thunar {
+  background-color: rgba(255, 255, 255, 0.75);
+}
+  
+treeview {
+    background: none;
+}
+
+
+.sidebar {
+    background-color: rgba(200, 200, 200, 0.25);
+}
+*/
+#docklike-plugin button {
+  min-height: 32px;
+  min-width: 32px;
+}
+
+/*Dock Like Plugin*/
+
+/* Brightly colored buttons */
+#docklike-plugin .open_group { background-color: #494c59; }
+#docklike-plugin .active_group { background-color: #494c59; }
+#docklike-plugin .hover_group { background-color: #494c59; }
+
+/* number of open windows label */
+#docklike-plugin .window_count { color: #2679db; }
+#docklike-plugin .open_group .window_count { color: #494c59; }
+#docklike-plugin .active_group .window_count { color : #494c59; }
+
+/* =====================================================================
+   macOS-like floating dock  —  added 2026-07-12 (panel redesign)
+   Backup of pre-change state: ~/.config/panel-redesign-backup-20260712-214421
+   Remove this whole block to revert the CSS half of the change.
+   ===================================================================== */
+
+/* NOTE: no !important anywhere — GTK3 (3.24) rejects `!important` on many
+   props as "Junk at end of value" and drops the declaration. User gtk.css
+   already loads at PRIORITY_USER (highest), so it wins without it. */
+
+/* XFCE 4.20: the pill is the panel WINDOW node. `.xfce4-panel.panel` is a
+   per-plugin box here, so background/border/margin on it draws one frame
+   around every plugin — that was the stray-border bug (fixed 2026-09-20). */
+#XfcePanelWindow,
+window.xfce4-panel {
+  background-color: rgba(30, 32, 42, 0.70);
+  background-image: none;
+  border-radius: 15px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: rgba(255, 255, 255, 0.13);
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.70);
+}
+
+/* plugin boxes carry no chrome of their own */
+.xfce4-panel.panel {
+  background-color: transparent;
+  background-image: none;
+  border-width: 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+  padding: 0 2px;
+}
+
+/* breathing room between plugins + horizontal padding around each icon
+   so small single-icon items aren't cramped edge-to-edge */
+.xfce4-panel.panel button.flat,
+.xfce4-panel.panel button.sidebar-button {
+  margin-left: 2px;
+  margin-right: 2px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+/* rounded hover pills — modest radius so narrow single-icon pills
+   don't look like blobs */
+.xfce4-panel.panel button.flat,
+.xfce4-panel.panel button.sidebar-button {
+  border-radius: 7px;
+  background-color: transparent;
+  transition: background-color 140ms ease, box-shadow 140ms ease;
+}
+.xfce4-panel.panel button.flat:hover,
+.xfce4-panel.panel button.sidebar-button:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+}
+.xfce4-panel.panel button.flat:active,
+.xfce4-panel.panel button.flat:checked,
+.xfce4-panel.panel button.sidebar-button:active,
+.xfce4-panel.panel button.sidebar-button:checked {
+  background-color: rgba(255, 255, 255, 0.16);
+  border-radius: 7px;
+}
+
+/* docklike taskbar: rounded, translucent group highlight */
+/* flush ends: no gap between the taskbar edge and first/last tab */
+#docklike-plugin { padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0; }
+#docklike-plugin button:first-child { margin-left: 0; }
+#docklike-plugin button:last-child { margin-right: 0; }
+/* highlight rounding matches the panel background pill (15px) */
+#docklike-plugin button { border-radius: 15px; }
+#docklike-plugin .open_group,
+#docklike-plugin .hover_group { background-color: rgba(255, 255, 255, 0.10); border-radius: 15px; }
+#docklike-plugin .active_group { background-color: rgba(255, 255, 255, 0.16); border-radius: 15px; }
+#docklike-plugin .active_group .window_count,
+#docklike-plugin .open_group .window_count { color: #e6ebef; }
+
+/* Whisker menu: full rounding + a touch more glass to match the dock */
+#whiskermenu-window {
+  background-color: rgba(28, 30, 38, 0.86);
+  border-radius: 14px;
+}
+
+
+/* 4.20.8: plugins sit in their own box/button nodes under the panel window and
+   keep the theme's background, which read as boxes around the clock and the
+   session button. Flatten everything under the window node; the pill bg lives
+   on #XfcePanelWindow itself. */
+#XfcePanelWindow box,
+#XfcePanelWindow widget {
+  background-color: transparent;
+  background-image: none;
+  border-width: 0;
+  box-shadow: none;
+}
+
+#XfcePanelWindow button,
+#XfcePanelWindow button:focus,
+.xfce4-panel.panel button,
+.xfce4-panel.panel button:focus {
+  background-color: transparent;
+  background-image: none;
+  border-width: 0;
+  border-radius: 7px;
+  box-shadow: none;
+  text-shadow: none;
+}
+#XfcePanelWindow button:hover,
+.xfce4-panel.panel button:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* docklike window-count badge: readable pill instead of bare digit on the icon */
+/* padding/min-width stay 0: the label also exists (empty) on single-window
+   buttons, and any padding there paints a stray blob over the icon */
+#docklike-plugin .window_count {
+  color: #ffffff;
+  background-color: rgba(18, 20, 28, 0.88);
+  border-radius: 6px;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+  font-size: 9px;
+  font-weight: bold;
+}
+
+
+/* xfwm4 Alt+Tab switcher: dark glass panel (backup: gtk.css.bak-tabwin-20261016) */
+#xfwm-tabwin {
+  -XfwmTabwinWidget-preview-size: 200;
+  -XfwmTabwinWidget-border-radius: 22;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: rgba(22, 23, 28, 0.84);
+}
+#xfwm-tabwin button {
+  padding: 10px;
+  border: none;
+  border-radius: 14px;
+  background: transparent;
+  box-shadow: none;
+}
+#xfwm-tabwin button:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+#xfwm-tabwin button:checked,
+#xfwm-tabwin button:selected,
+#xfwm-tabwin button:focus,
+#xfwm-tabwin button:active {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+#xfwm-tabwin label {
+  color: #f1f2f4;
+  font-weight: 600;
+}
+
+
+/* desktop polish 2026-10-16 (backup: ~/.config/desktop-polish-backup-20261016) */
+/* terminal: breathing room around the text */
+vte-terminal {
+  padding: 10px 14px;
+}
+/* panel glass: slightly clearer now that picom blurs behind it */
+#XfcePanelWindow,
+window.xfce4-panel {
+  background-color: rgba(26, 27, 38, 0.66);
+}
+/* docklike: dots mark running apps, so no box around them; only hover/active get a soft fill */
+#docklike-plugin button,
+#docklike-plugin .open_group {
+  background-color: transparent;
+  border-width: 0;
+  box-shadow: none;
+  outline-width: 0;
+}
+#docklike-plugin .hover_group,
+#docklike-plugin button:hover { background-color: rgba(255, 255, 255, 0.08); }
+#docklike-plugin .active_group { background-color: rgba(255, 255, 255, 0.09); }
+/* docklike: hover/active tile floats inside the bar instead of touching the screen edge */
+#docklike-plugin button {
+  border-style: solid;
+  border-color: transparent;
+  border-width: 4px 0;
+  background-clip: padding-box;
+  border-radius: 10px;
+}
+#docklike-plugin .open_group,
+#docklike-plugin .hover_group,
+#docklike-plugin .active_group { border-radius: 10px; }
+/* window-count badge: no background, the label exists EMPTY on single-window apps and
+   its 1px-wide dark box showed as a thin mark at the top of every dock icon */
+#docklike-plugin .window_count,
+#docklike-plugin .open_group .window_count,
+#docklike-plugin .active_group .window_count {
+  background-color: transparent;
+  color: #ffffff;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.95), 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+
+/* Thunar in the terminal palette (2026-10-17) */
+window.thunar,
+window.thunar .view,
+window.thunar treeview.view,
+window.thunar iconview,
+window.thunar scrolledwindow,
+window.thunar notebook,
+window.thunar notebook stack {
+  background-color: #1a1b26;
+  color: #c0caf5;
+}
+window.thunar .view:selected,
+window.thunar treeview.view:selected,
+window.thunar iconview:selected {
+  background-color: rgba(122, 162, 247, 0.24);
+  color: #ffffff;
+}
+window.thunar treeview.view:hover { background-color: rgba(255, 255, 255, 0.04); }
+window.thunar treeview.view header button {
+  background-color: #1a1b26;
+  background-image: none;
+  color: #737aa2;
+  border-style: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+}
+
+/* sidebar */
+window.thunar .sidebar,
+window.thunar .sidebar treeview,
+window.thunar .sidebar .view,
+window.thunar placessidebar,
+window.thunar placessidebar list {
+  background-color: #16161e;
+  color: #a9b1d6;
+}
+window.thunar .sidebar treeview:selected,
+window.thunar placessidebar row:selected {
+  background-color: rgba(122, 162, 247, 0.20);
+  color: #ffffff;
+}
+window.thunar paned > separator { background-color: rgba(255, 255, 255, 0.05); min-width: 1px; background-image: none; }
+
+/* toolbar, path bar, location entry */
+window.thunar toolbar,
+window.thunar .toolbar {
+  background-color: #1a1b26;
+  background-image: none;
+  border-style: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 4px 6px;
+}
+window.thunar toolbar button {
+  background-color: transparent;
+  background-image: none;
+  border-style: none;
+  box-shadow: none;
+  border-radius: 8px;
+}
+window.thunar toolbar button:hover { background-color: rgba(255, 255, 255, 0.07); }
+window.thunar .path-bar button {
+  border-radius: 8px;
+  color: #a9b1d6;
+}
+window.thunar .path-bar button:checked {
+  background-color: rgba(122, 162, 247, 0.18);
+  color: #c0caf5;
+}
+window.thunar toolbar entry {
+  background-color: rgba(255, 255, 255, 0.06);
+  background-image: none;
+  border-style: none;
+  border-radius: 8px;
+  box-shadow: none;
+  color: #c0caf5;
+}
+window.thunar toolbar entry:focus { box-shadow: inset 0 0 0 1px rgba(122, 162, 247, 0.6); }
+
+/* status bar and menubar */
+window.thunar statusbar { background-color: #16161e; color: #737aa2; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+window.thunar menubar { background-color: #1a1b26; background-image: none; box-shadow: none; border-style: none; }

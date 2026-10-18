@@ -1,0 +1,14 @@
+#!/bin/bash
+# Workspace switching with a name label: ws 0|1|2 | ws next|prev | ws move N
+osd() { pkill -f "^python3 [^ ]*desktop-look/osd.py" 2>/dev/null; setsid python3 ~/.local/share/desktop-look/osd.py "$1" 0.9 >/dev/null 2>&1 & }
+n=$(xdotool get_num_desktops); cur=$(xdotool get_desktop)
+name() { xfconf-query -c xfwm4 -p /general/workspace_names 2>/dev/null | sed -n "$(( $1 + 3 ))p"; }
+case "$1" in
+  next) t=$(( (cur + 1) % n ));;
+  prev) t=$(( (cur - 1 + n) % n ));;
+  move) t=$2; w=$(xdotool getactivewindow); xdotool set_desktop_for_window "$w" "$t"; xdotool set_desktop "$t"; sleep 0.15; xdotool windowactivate "$w"; osd "→ $(name $t)"; exit;;
+  *) t=$1;;
+esac
+[ "$t" -ge "$n" ] && exit 0
+[ "$t" != "$cur" ] && xdotool set_desktop "$t"
+osd "$(name $t)"

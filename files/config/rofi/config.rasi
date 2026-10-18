@@ -1,0 +1,23 @@
+configuration {
+  modi: "drun,window,filebrowser,calc,emoji";
+  show-icons: true;
+  icon-theme: "Qogir-Dark";
+  display-drun: "Aplikacje";
+  display-window: "Okna";
+  display-filebrowser: "Pliki";
+  display-calc: "Kalkulator";
+  display-emoji: "Emoji";
+  display-power: "Zasilanie";
+  display-dmenu: "Schowek";
+  drun-display-format: "{name}";
+  matching: "fuzzy";
+  sort: true;
+  sorting-method: "fzf";
+  disable-history: false;
+  kb-mode-next: "Tab";
+  kb-mode-previous: "ISO_Left_Tab";
+  kb-row-tab: "";
+  kb-element-next: "";
+  kb-element-prev: "";
+}
+@theme "~/.config/rofi/spotlight.rasi"

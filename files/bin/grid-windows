@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+# Arranges every visible window on the current workspace in an even grid with small gaps.
+import subprocess, math
+GAP = 10
+def sh(*a): return subprocess.run(a, capture_output=True, text=True).stdout
+def prop(w, name):
+    return sh('xprop', '-id', w, name)
+desk = int(sh('xdotool', 'get_desktop'))
+area = [int(v) for v in sh('xprop', '-root', '_NET_WORKAREA').split('=')[1].replace(',', ' ').split()[:4]]
+ax, ay, aw, ah = area
+wins = []
+for line in sh('wmctrl', '-l').splitlines():
+    w, d = line.split()[0], int(line.split()[1])
+    if d != desk: continue
+    t = prop(w, '_NET_WM_WINDOW_TYPE')
+    if '_NET_WM_WINDOW_TYPE_NORMAL' not in t and 'not found' not in t: continue
+    if '_NET_WM_STATE_HIDDEN' in prop(w, '_NET_WM_STATE'): continue
+    wins.append(w)
+n = len(wins)
+if not n: raise SystemExit
+cols = math.ceil(math.sqrt(n)); rows = math.ceil(n / cols)
+if n == 3: cols, rows = 3, 1
+cw = (aw - GAP * (cols + 1)) // cols
+for i, w in enumerate(wins):
+    r, c = divmod(i, cols)
+    in_row = cols if r < rows - 1 else n - cols * (rows - 1)
+    rw = (aw - GAP * (in_row + 1)) // in_row
+    rh = (ah - GAP * (rows + 1)) // rows
+    x = ax + GAP + c * (rw + GAP); y = ay + GAP + r * (rh + GAP)
+    fe = prop(w, '_NET_FRAME_EXTENTS')
+    l, rr, t, b = ([int(v) for v in fe.split('=')[1].replace(',', ' ').split()] if '=' in fe else [0, 0, 0, 0])
+    subprocess.run(['wmctrl', '-i', '-r', w, '-b', 'remove,maximized_vert,maximized_horz'])
+    subprocess.run(['wmctrl', '-i', '-r', w, '-e', f'0,{x},{y},{rw - l - rr},{rh - t - b}'])

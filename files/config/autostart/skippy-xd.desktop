@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=skippy-xd
+Comment=Window overview daemon (Super+Tab)
+Exec=skippy-xd --start-daemon
+X-GNOME-Autostart-enabled=true

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Calendar popup
+Comment=Clock calendar, started hidden so it opens instantly
+Exec=@HOME@/.local/bin/calendar-popup --daemon
+NoDisplay=true
+StartupNotify=false
+Terminal=false

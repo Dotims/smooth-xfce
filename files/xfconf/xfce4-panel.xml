@@ -1,0 +1,104 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<channel name="xfce4-panel" version="1.0">
+  <property name="configver" type="int" value="2"/>
+  <property name="panels" type="array">
+    <value type="int" value="1"/>
+    <property name="dark-mode" type="bool" value="true"/>
+    <property name="panel-1" type="empty">
+      <property name="position" type="string" value="p=8;x=960;y=1060"/>
+      <property name="size" type="uint" value="50"/>
+      <property name="length" type="uint" value="100"/>
+      <property name="position-locked" type="bool" value="true"/>
+      <property name="nrows" type="uint" value="1"/>
+      <property name="icon-size" type="uint" value="0"/>
+      <property name="mode" type="uint" value="0"/>
+      <property name="background-style" type="uint" value="0"/>
+      <property name="autohide-behavior" type="uint" value="0"/>
+      <property name="span-monitors" type="bool" value="false"/>
+      <property name="plugin-ids" type="array">
+        <value type="int" value="1"/>
+        <value type="int" value="15"/>
+        <value type="int" value="2"/>
+        <value type="int" value="3"/>
+        <value type="int" value="23"/>
+        <value type="int" value="18"/>
+        <value type="int" value="6"/>
+        <value type="int" value="21"/>
+        <value type="int" value="16"/>
+        <value type="int" value="7"/>
+        <value type="int" value="8"/>
+        <value type="int" value="20"/>
+      </property>
+    </property>
+  </property>
+  <property name="plugins" type="empty">
+    <property name="plugin-3" type="string" value="separator">
+      <property name="expand" type="bool" value="true"/>
+      <property name="style" type="uint" value="0"/>
+    </property>
+    <property name="plugin-6" type="string" value="systray">
+      <property name="square-icons" type="bool" value="true"/>
+      <property name="icon-size" type="int" value="22"/>
+    </property>
+    <property name="plugin-8" type="string" value="clock">
+      <property name="timezone" type="string" value="Europe/Warsaw"/>
+      <property name="digital-date-font" type="string" value="Inter 8"/>
+      <property name="digital-date-format" type="string" value="%d.%m.%Y"/>
+      <property name="digital-time-font" type="string" value="Inter SemiBold 10"/>
+      <property name="mode" type="uint" value="2"/>
+      <property name="digital-layout" type="uint" value="1"/>
+      <property name="digital-time-format" type="string" value="%H:%M"/>
+      <property name="command" type="string" value="@HOME@/.local/bin/calendar-popup"/>
+    </property>
+    <property name="plugin-1" type="string" value="whiskermenu">
+      <property name="menu-opacity" type="int" value="98"/>
+      <property name="favorites" type="array">
+        <value type="string" value="xfce4-file-manager.desktop"/>
+        <value type="string" value="xfce4-terminal-emulator.desktop"/>
+        <value type="string" value="google-chrome.desktop"/>
+        <value type="string" value="xfce4-taskmanager.desktop"/>
+        <value type="string" value="firefox.desktop"/>
+        <value type="string" value="org.kde.kolourpaint.desktop"/>
+        <value type="string" value="libreoffice-writer.desktop"/>
+      </property>
+      <property name="menu-height" type="int" value="498"/>
+      <property name="button-icon" type="string" value="@HOME@/.local/share/icons/arch-menu.svg"/>
+    </property>
+    <property name="plugin-7" type="string" value="separator">
+      <property name="style" type="uint" value="0"/>
+    </property>
+    <property name="plugin-2" type="string" value="docklike"/>
+    <property name="plugin-15" type="string" value="separator">
+      <property name="expand" type="bool" value="false"/>
+      <property name="style" type="uint" value="0"/>
+    </property>
+    <property name="plugin-16" type="string" value="pulseaudio">
+      <property name="enable-keyboard-shortcuts" type="bool" value="true"/>
+      <property name="known-players" type="string" value="Brave;Chrome;Chromium;firefox;spotify"/>
+      <property name="enable-mpris" type="bool" value="true"/>
+      <property name="enable-multimedia-keys" type="bool" value="true"/>
+    </property>
+    <property name="plugin-18" type="string" value="night-shift"/>
+    <property name="plugin-20" type="string" value="separator">
+      <property name="style" type="uint" value="0"/>
+    </property>
+    <property name="clipman" type="empty">
+      <property name="settings" type="empty">
+        <property name="add-primary-clipboard" type="bool" value="false"/>
+      </property>
+      <property name="tweaks" type="empty">
+        <property name="paste-on-activate" type="uint" value="2"/>
+      </property>
+    </property>
+    <property name="plugin-21" type="string" value="power-manager-plugin"/>
+    <property name="plugin-23" type="string" value="genmon">
+      <property name="command" type="string" value="@HOME@/.local/bin/now-playing"/>
+      <property name="use-label" type="bool" value="false"/>
+      <property name="update-period" type="int" value="2000"/>
+      <property name="enable-single-row" type="bool" value="true"/>
+      <property name="font" type="string" value="Inter 9.5"/>
+      <property name="text" type="string" value="(genmon)"/>
+    </property>
+  </property>
+</channel>

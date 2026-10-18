@@ -1,0 +1,5 @@
+#!/bin/sh
+# xsecurelock saver: show the lock wallpaper in the lock window.
+exec mpv --vo=x11 --really-quiet --no-audio --no-input-terminal --no-osc --no-config \
+  --image-display-duration=inf --loop-file=inf --panscan=1.0 \
+  --wid="$XSCREENSAVER_WINDOW" "$HOME/.cache/lock-bg.png"

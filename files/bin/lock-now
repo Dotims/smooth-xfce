@@ -1,0 +1,19 @@
+#!/bin/sh
+# Lock the screen; typing shows a password prompt with dots.
+pgrep -x xsecurelock >/dev/null && exit 0
+export XSECURELOCK_SAVER="$HOME/.local/bin/lock-saver"
+export XSECURELOCK_PASSWORD_PROMPT=asterisks
+export XSECURELOCK_DISCARD_FIRST_KEYPRESS=0
+export XSECURELOCK_SHOW_DATETIME=1
+export XSECURELOCK_DATETIME_FORMAT="%H:%M"
+export XSECURELOCK_SHOW_HOSTNAME=0
+export XSECURELOCK_SHOW_USERNAME=1
+export XSECURELOCK_SHOW_KEYBOARD_LAYOUT=0
+export XSECURELOCK_BLANK_TIMEOUT=-1
+# picom unmaps the lock windows out of order and flashes the obscurer ("PLEASE FIX!"); README fix
+export XSECURELOCK_COMPOSITE_OBSCURER=0
+export XSECURELOCK_FONT="Inter:size=19:weight=medium"
+export XSECURELOCK_AUTH_BACKGROUND_COLOR="#1c1e2b"
+export XSECURELOCK_AUTH_FOREGROUND_COLOR="#c0caf5"
+export XSECURELOCK_AUTH_WARNING_COLOR="#f7768e"
+exec xsecurelock

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=picom
+Comment=Compositor (macOS-like vibrancy) — replaces xfwm4 compositing
+Exec=picom --config @HOME@/.config/picom/picom.conf
+X-XFCE-Autostart-Override=true
+X-GNOME-Autostart-enabled=true

@@ -1,0 +1,48 @@
+# Tokyo Night prompt (2026-10-16): folder, git, time taken, arrow
+add_newline = true
+format = "$directory$git_branch$git_status$nodejs$python$cmd_duration$line_break$character"
+command_timeout = 800
+
+[directory]
+style = "bold #7aa2f7"
+truncation_length = 3
+truncation_symbol = "…/"
+home_symbol = "~"
+read_only = " 󰌾"
+
+[git_branch]
+symbol = " "
+style = "#bb9af7"
+format = "[on](#565f89) [$symbol$branch]($style) "
+
+[git_status]
+style = "#e0af68"
+format = "([$all_status$ahead_behind]($style) )"
+modified = "!"
+untracked = "?"
+staged = "+"
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕"
+
+[nodejs]
+symbol = " "
+style = "#9ece6a"
+format = "[$symbol$version]($style) "
+detect_files = ["package.json"]
+
+[python]
+symbol = " "
+style = "#e0af68"
+format = "[$symbol$version( \\($virtualenv\\))]($style) "
+detect_extensions = []
+detect_files = ["pyproject.toml", "requirements.txt", ".python-version", "setup.py"]
+
+[cmd_duration]
+min_time = 2000
+style = "#565f89"
+format = "[took $duration]($style)"
+
+[character]
+success_symbol = "[❯](bold #7aa2f7)"
+error_symbol = "[❯](bold #f7768e)"

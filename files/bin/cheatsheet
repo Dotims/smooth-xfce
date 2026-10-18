@@ -1,0 +1,4 @@
+#!/bin/bash
+# Toggles the shortcut sheet.
+pkill -f "^python3 [^ ]*desktop-look/cheatsheet.py" && exit 0
+exec python3 ~/.local/share/desktop-look/cheatsheet.py

@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+# Renders ~/.cache/lock-bg.png from the current XFCE wallpaper: blurred and darkened, with a rounded
+# card whose fill is exactly xsecurelock's auth box color, so the square box blends into the card.
+import getpass, os, subprocess
+from PIL import Image, ImageFilter, ImageEnhance, ImageDraw, ImageFont
+out = os.path.expanduser("~/.cache/lock-bg.png")
+keys = subprocess.run(["xfconf-query", "-c", "xfce4-desktop", "-l"], capture_output=True, text=True).stdout.split()
+key = next(k for k in keys if k.endswith("workspace0/last-image"))
+src = subprocess.run(["xfconf-query", "-c", "xfce4-desktop", "-p", key], capture_output=True, text=True).stdout.strip()
+W, H = 1920, 1080
+CARD = (28, 30, 43)                      # = XSECURELOCK_AUTH_BACKGROUND_COLOR #1c1e2b
+CX, CY, CW, CH, R = 963, 556, 460, 440, 28  # auth box ~269x254 centred near (963, 556) at Inter 19
+
+im = Image.open(src).convert("RGB")
+s = max(W / im.width, H / im.height)
+im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
+im = im.crop(((im.width - W) // 2, (im.height - H) // 2, (im.width - W) // 2 + W, (im.height - H) // 2 + H))
+im = im.filter(ImageFilter.GaussianBlur(28))
+im = ImageEnhance.Brightness(im).enhance(0.55)
+im = Image.blend(im, Image.new("RGB", (W, H), (26, 27, 38)), 0.35)
+
+x0, y0, x1, y1 = CX - CW // 2, CY - CH // 2, CX + CW // 2, CY + CH // 2
+shadow = Image.new("L", (W, H), 0)
+ImageDraw.Draw(shadow).rounded_rectangle((x0, y0 + 18, x1, y1 + 18), R, fill=150)
+shadow = shadow.filter(ImageFilter.GaussianBlur(30))
+im = Image.composite(Image.new("RGB", (W, H), (8, 9, 14)), im, shadow)
+d = ImageDraw.Draw(im)
+d.rounded_rectangle((x0, y0, x1, y1), R, fill=CARD, outline=(52, 56, 76), width=1)
+
+f = "/usr/share/fonts/inter/InterVariable.ttf"
+def font(sz, var=None):
+    ft = ImageFont.truetype(f, sz)
+    if var: ft.set_variation_by_name(var)
+    return ft
+def centred(text, ft, y, color):
+    d.text((CX - d.textlength(text, font=ft) / 2, y), text, font=ft, fill=color)
+
+# lock glyph above the auth box, visible in both states
+icon = ImageFont.truetype("/usr/share/fonts/TTF/JetBrainsMonoNerdFont-Regular.ttf", 30)
+centred("\U000F033E", icon, y0 + 22, (122, 162, 247))
+# idle text, fully inside the auth box area so the box hides it while typing
+centred(getpass.getuser(), font(30, "SemiBold"), CY - 52, (192, 202, 245))
+centred("Zacznij pisać hasło", font(17), CY + 2, (115, 122, 162))
+# under the box
+centred("Enter odblokowuje", font(14), y1 - 42, (86, 95, 137))
+im.save(out)
+print(out)

@@ -1,0 +1,11 @@
+#!/bin/bash
+# genmon: current Spotify track in the panel; click toggles play/pause, empty when Spotify is off.
+st=$(playerctl -p spotify status 2>/dev/null) || { echo "<txt></txt>"; exit; }
+t=$(playerctl -p spotify metadata title 2>/dev/null); a=$(playerctl -p spotify metadata artist 2>/dev/null)
+esc() { sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'; }
+line="$t · $a"; [ ${#line} -gt 42 ] && line="${line:0:41}…"
+line=$(printf '%s' "$line" | esc)
+if [ "$st" = Playing ]; then icon="♪"; color="#a9b1d6"; else icon="⏸"; color="#565f89"; fi
+echo "<txt><span font='Inter 9.5' foreground='$color'>$icon  $line</span></txt>"
+echo "<txtclick>playerctl -p spotify play-pause</txtclick>"
+printf '<tool>%s\n%s\n\nKlik: pauza / wznów. Następny i poprzedni: klawisze multimedialne albo menu głośnika.</tool>\n' "$(printf '%s' "$t" | esc)" "$(printf '%s' "$a" | esc)"

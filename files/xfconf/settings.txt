@@ -1,0 +1,187 @@
+xfwm4|/general/theme|Qogir-Dark-Night
+xfwm4|/general/use_compositing|false
+xfwm4|/general/cycle_hidden|true
+xfwm4|/general/title_font|Inter Medium 10
+xfwm4|/general/button_layout|O|SHMC
+xsettings|/Net/ThemeName|Qogir-Dark-Night
+xsettings|/Net/IconThemeName|Qogir-Dark
+xsettings|/Gtk/CursorThemeName|Bibata-Modern-Ice
+xsettings|/Gtk/CursorThemeSize|24
+xsettings|/Gtk/FontName|Inter Medium 10
+xsettings|/Gtk/MonospaceFontName|Inter 10
+xsettings|/Xft/HintStyle|hintslight
+xsettings|/Xft/RGBA|rgb
+xfce4-terminal|/color-background|#1a1b26
+xfce4-terminal|/color-bold-use-default|true
+xfce4-terminal|/color-cursor|#e0af68
+xfce4-terminal|/color-cursor-foreground|#1a1b26
+xfce4-terminal|/color-cursor-use-default|false
+xfce4-terminal|/color-foreground|#c0caf5
+xfce4-terminal|/color-palette|#15161e;#f7768e;#9ece6a;#e0af68;#7aa2f7;#bb9af7;#7dcfff;#a9b1d6;#414868;#ff899d;#9fe044;#faba4a;#8db0ff;#c7a9ff;#a4daff;#c0caf5
+xfce4-terminal|/color-selection|#c0caf5
+xfce4-terminal|/color-selection-background|#2e3c64
+xfce4-terminal|/color-selection-use-default|false
+xfce4-terminal|/color-use-theme|false
+xfce4-terminal|/dropdown-always-show-tabs|false
+xfce4-terminal|/dropdown-animation-time|140
+xfce4-terminal|/dropdown-height|45
+xfce4-terminal|/dropdown-keep-above|true
+xfce4-terminal|/dropdown-keep-open-default|false
+xfce4-terminal|/dropdown-move-to-active|true
+xfce4-terminal|/dropdown-opacity|100
+xfce4-terminal|/dropdown-position|50
+xfce4-terminal|/dropdown-status-icon|false
+xfce4-terminal|/dropdown-toggle-focus|true
+xfce4-terminal|/dropdown-width|70
+xfce4-terminal|/font-name|JetBrainsMono Nerd Font 12
+xfce4-terminal|/font-use-system|false
+xfce4-terminal|/misc-bell|false
+xfce4-terminal|/misc-borders-default|true
+xfce4-terminal|/misc-confirm-close|false
+xfce4-terminal|/misc-copy-on-select|true
+xfce4-terminal|/misc-cursor-shape|TERMINAL_CURSOR_SHAPE_BLOCK
+xfce4-terminal|/misc-highlight-urls|true
+xfce4-terminal|/misc-menubar-default|false
+xfce4-terminal|/misc-middle-click-opens-uri|false
+xfce4-terminal|/misc-mouse-autohide|true
+xfce4-terminal|/misc-show-unsafe-paste-dialog|false
+xfce4-terminal|/misc-toolbar-default|false
+xfce4-terminal|/scrolling-bar|TERMINAL_SCROLLBAR_NONE
+xfce4-terminal|/scrolling-unlimited|true
+xfce4-terminal|/tab-activity-color|#7aa2f7
+xfce4-panel|/plugins/plugin-1/button-icon|@HOME@/.local/share/icons/arch-menu.svg
+xfce4-panel|/plugins/plugin-8/command|@HOME@/.local/bin/calendar-popup
+xfce4-panel|/plugins/plugin-8/digital-date-font|Inter 8
+xfce4-panel|/plugins/plugin-8/digital-date-format|%d.%m.%Y
+xfce4-panel|/plugins/plugin-8/digital-layout|1
+xfce4-panel|/plugins/plugin-8/digital-time-font|Inter SemiBold 10
+xfce4-panel|/plugins/plugin-8/digital-time-format|%H:%M
+xfce4-panel|/plugins/plugin-8/mode|2
+xfce4-panel|/plugins/plugin-8/timezone|Europe/Warsaw
+xfce4-notifyd|/theme|Night-Glass
+xfce4-keyboard-shortcuts|/commands/custom/<Super>space|rofi -show drun
+xfce4-keyboard-shortcuts|/commands/custom/<Alt><Super>s|orca
+xfce4-keyboard-shortcuts|/commands/custom/<Alt>F1|xfce4-popup-applicationsmenu
+xfce4-keyboard-shortcuts|/commands/custom/<Alt>F2|xfce4-appfinder --collapsed
+xfce4-keyboard-shortcuts|/commands/custom/<Alt>F2/startup-notify|true
+xfce4-keyboard-shortcuts|/commands/custom/<Alt>F3|xfce4-appfinder
+xfce4-keyboard-shortcuts|/commands/custom/<Alt>F3/startup-notify|true
+xfce4-keyboard-shortcuts|/commands/custom/<Alt>Print|xfce4-screenshooter -w
+xfce4-keyboard-shortcuts|/commands/custom/<Primary><Alt>Delete|xfce4-session-logout
+xfce4-keyboard-shortcuts|/commands/custom/<Primary><Alt>Escape|xkill
+xfce4-keyboard-shortcuts|/commands/custom/<Primary><Alt>f|thunar
+xfce4-keyboard-shortcuts|/commands/custom/<Primary><Alt>l|xflock4
+xfce4-keyboard-shortcuts|/commands/custom/<Primary><Alt>t|exo-open --launch TerminalEmulator
+xfce4-keyboard-shortcuts|/commands/custom/<Primary><Shift>Escape|xfce4-taskmanager
+xfce4-keyboard-shortcuts|/commands/custom/<Primary><Shift>s|xfce4-screenshooter -r
+xfce4-keyboard-shortcuts|/commands/custom/<Primary>Escape|xfdesktop --menu
+xfce4-keyboard-shortcuts|/commands/custom/<Primary>semicolon|rofimoji
+xfce4-keyboard-shortcuts|/commands/custom/<Shift><Super>1|@HOME@/.local/bin/ws move 0
+xfce4-keyboard-shortcuts|/commands/custom/<Shift><Super>2|@HOME@/.local/bin/ws move 1
+xfce4-keyboard-shortcuts|/commands/custom/<Shift><Super>3|@HOME@/.local/bin/ws move 2
+xfce4-keyboard-shortcuts|/commands/custom/<Shift><Super>at|@HOME@/.local/bin/ws move 1
+xfce4-keyboard-shortcuts|/commands/custom/<Shift><Super>exclam|@HOME@/.local/bin/ws move 0
+xfce4-keyboard-shortcuts|/commands/custom/<Shift><Super>numbersign|@HOME@/.local/bin/ws move 2
+xfce4-keyboard-shortcuts|/commands/custom/<Shift><Super>s|xfce4-screenshooter -r -c
+xfce4-keyboard-shortcuts|/commands/custom/<Super>1|@HOME@/.local/bin/ws 0
+xfce4-keyboard-shortcuts|/commands/custom/<Super>2|@HOME@/.local/bin/ws 1
+xfce4-keyboard-shortcuts|/commands/custom/<Super>3|@HOME@/.local/bin/ws 2
+xfce4-keyboard-shortcuts|/commands/custom/<Super><Shift>v|xfce4-popup-clipman
+xfce4-keyboard-shortcuts|/commands/custom/<Super>Escape|rofi -show power -modi power:@HOME@/.local/bin/rofi-power
+xfce4-keyboard-shortcuts|/commands/custom/<Super>Tab|skippy-xd --expose
+xfce4-keyboard-shortcuts|/commands/custom/<Super>a|@HOME@/.local/bin/airpods toggle
+xfce4-keyboard-shortcuts|/commands/custom/<Super>c|rofi -show calc -modi calc -no-show-match -no-sort -no-history -kb-accept-entry Control+Return -kb-accept-custom Return -calc-command "echo -n '{result}' | xclip -selection clipboard"
+xfce4-keyboard-shortcuts|/commands/custom/<Super>e|thunar
+xfce4-keyboard-shortcuts|/commands/custom/<Super>g|@HOME@/.local/bin/grid-windows
+xfce4-keyboard-shortcuts|/commands/custom/<Super>grave|xfce4-terminal --drop-down
+xfce4-keyboard-shortcuts|/commands/custom/<Super>l|xflock4
+xfce4-keyboard-shortcuts|/commands/custom/<Super>p|xfce4-display-settings --minimal
+xfce4-keyboard-shortcuts|/commands/custom/<Super>r|xfce4-appfinder -c
+xfce4-keyboard-shortcuts|/commands/custom/<Super>r/startup-notify|true
+xfce4-keyboard-shortcuts|/commands/custom/<Super>semicolon|rofi -show emoji -modi emoji
+xfce4-keyboard-shortcuts|/commands/custom/<Super>slash|@HOME@/.local/bin/cheatsheet
+xfce4-keyboard-shortcuts|/commands/custom/<Super>space|rofi -show drun
+xfce4-keyboard-shortcuts|/commands/custom/<Super>t|xfce4-terminal
+xfce4-keyboard-shortcuts|/commands/custom/<Super>v|@HOME@/.local/bin/clipboard-menu
+xfce4-keyboard-shortcuts|/commands/custom/F11|flameshot gui --region all
+xfce4-keyboard-shortcuts|/commands/custom/HomePage|exo-open --launch WebBrowser
+xfce4-keyboard-shortcuts|/commands/custom/KP_Decimal|pkill -USR2 -x handy
+xfce4-keyboard-shortcuts|/commands/custom/KP_Delete|pkill -USR2 -x handy
+xfce4-keyboard-shortcuts|/commands/custom/KP_Separator|pkill -USR2 -x handy
+xfce4-keyboard-shortcuts|/commands/custom/Print|flameshot gui
+xfce4-keyboard-shortcuts|/commands/custom/Super_L|xfce4-popup-whiskermenu
+xfce4-keyboard-shortcuts|/commands/custom/XF86Display|xfce4-display-settings --minimal
+xfce4-keyboard-shortcuts|/commands/custom/XF86Mail|exo-open --launch MailReader
+xfce4-keyboard-shortcuts|/commands/custom/XF86WWW|exo-open --launch WebBrowser
+xfce4-keyboard-shortcuts|/commands/custom/override|true
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Alt><Shift>Tab|cycle_reverse_windows_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Alt>Delete|del_workspace_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Alt>F10|maximize_window_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Alt>F11|fullscreen_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Alt>F12|above_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Alt>F4|close_window_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Alt>F6|stick_window_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Alt>F7|move_window_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Alt>F8|resize_window_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Alt>F9|hide_window_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Alt>Insert|add_workspace_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Alt>Tab|cycle_windows_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Alt>space|popup_menu_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>Down|down_workspace_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>End|move_window_next_workspace_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>Home|move_window_prev_workspace_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>KP_1|move_window_workspace_1_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>KP_2|move_window_workspace_2_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>KP_3|move_window_workspace_3_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>KP_4|move_window_workspace_4_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>KP_5|move_window_workspace_5_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>KP_6|move_window_workspace_6_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>KP_7|move_window_workspace_7_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>KP_8|move_window_workspace_8_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>KP_9|move_window_workspace_9_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>Left|left_workspace_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>Right|right_workspace_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>Up|up_workspace_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Alt>d|show_desktop_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Shift><Alt>Left|move_window_left_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Shift><Alt>Right|move_window_right_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary><Shift><Alt>Up|move_window_up_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary>F1|workspace_1_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary>F10|workspace_10_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary>F11|workspace_11_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary>F12|workspace_12_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary>F2|workspace_2_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary>F3|workspace_3_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary>F4|workspace_4_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary>F5|workspace_5_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary>F6|workspace_6_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary>F7|workspace_7_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary>F8|workspace_8_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Primary>F9|workspace_9_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Shift><Alt>Page_Down|lower_window_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Shift><Alt>Page_Up|raise_window_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>Down|hide_window_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>KP_Down|tile_down_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>KP_End|tile_down_left_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>KP_Home|tile_up_left_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>KP_Left|tile_left_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>KP_Next|tile_down_right_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>KP_Page_Up|tile_up_right_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>KP_Right|tile_right_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>KP_Up|tile_up_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>Left|tile_left_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>Right|tile_right_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>Up|maximize_window_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>d|show_desktop_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>i|tile_up_right_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>j|tile_down_left_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>k|tile_down_right_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/<Super>u|tile_up_left_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/Down|down_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/Escape|cancel_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/Left|left_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/Right|right_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/Up|up_key
+xfce4-keyboard-shortcuts|/xfwm4/custom/override|true
+xfce4-panel|/plugins/plugin-16/enable-mpris|true
+xfce4-panel|/plugins/plugin-16/enable-multimedia-keys|true

@@ -1,0 +1,7 @@
+#!/bin/bash
+# Toggles the clock calendar; starts it on first use (`--daemon` starts it hidden).
+if [ "$1" != --daemon ]; then
+  gdbus call --session --dest dev.dotims.Calendar --object-path /dev/dotims/Calendar \
+    --method org.freedesktop.Application.Activate '{}' >/dev/null 2>&1 && exit 0
+fi
+exec python3 ~/.local/share/desktop-look/calendar.py "$@"

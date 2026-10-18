@@ -1,0 +1,4 @@
+#!/bin/bash
+# Clipboard history in the Spotlight launcher; the chosen entry goes back to the clipboard.
+CM_LAUNCHER=rofi clipmenu -p "Schowek" -mesg "Enter kopiuje, potem wklej Ctrl+V" && \
+  setsid python3 ~/.local/share/desktop-look/osd.py "Skopiowano" 0.7 >/dev/null 2>&1 &
