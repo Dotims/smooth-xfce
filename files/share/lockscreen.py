@@ -94,24 +94,29 @@ class LockScreen:
         _, _, w, h = parent.get_geometry()
         self.parent = parent
         if auth:
-            # like auth_x11: the auth window is ours to size and map (main keeps it on top)
             _, _, w, h = Gdk.get_default_root_window().get_geometry()
-            parent.move_resize(0, 0, w, h)
-            parent.show()
             rects = [display.get_monitor(i).get_geometry() for i in range(display.get_n_monitors())]
             self.monitors = [(r.x, r.y, r.width, r.height) for r in rects] or [(0, 0, w, h)]
         else:
             self.monitors = [(0, 0, w, h)]  # saver_multiplex gives each monitor its own window
 
-        self.win = Gtk.Window(type=Gtk.WindowType.POPUP)
+        self.win = self.area = Gtk.Window(type=Gtk.WindowType.POPUP)
         self.win.set_app_paintable(True)
         self.win.set_size_request(w, h)
-        self.area = Gtk.DrawingArea()
-        self.area.connect('draw', self.draw)
-        self.win.add(self.area)
+        self.win.connect('draw', self.draw)
         self.win.realize()
+        # the first frame as the X background, so mapping never shows black before GTK draws
+        self.first = cairo.ImageSurface(cairo.FORMAT_RGB24, w, h)
+        self.draw(None, cairo.Context(self.first))
+        self.first_pattern = cairo.SurfacePattern(self.first)
+        self.win.get_window().set_background_pattern(self.first_pattern)
         self.win.get_window().reparent(parent, 0, 0)
         self.win.show_all()
+        if auth:
+            # like auth_x11: the auth window is ours to size and map (main keeps it on top)
+            parent.set_background_pattern(self.first_pattern)
+            parent.move_resize(0, 0, w, h)
+            parent.show()
 
         GLib.timeout_add(1000 - int(time.time() * 1000) % 1000 + 5, self.tick)
         for sig in (signal.SIGTERM, signal.SIGINT):
