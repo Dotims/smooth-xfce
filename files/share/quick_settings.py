@@ -175,6 +175,8 @@ class QuickSettings(Popup):
         top.pack_start(bat, True, True, 0)
         for glyph, cmd in (('\U000f0493', ['xfce4-settings-manager']),
                            ('\U000f033e', [os.path.expanduser('~/.local/bin/lock-now')]),
+                           # the delay lets the click release pass, or it wakes the screen again
+                           ('\U000f0d90', ['sh', '-c', 'sleep 0.5; xset dpms force off']),
                            ('\U000f0425', ['rofi', '-show', 'power', '-modi',
                                            'power:' + os.path.expanduser('~/.local/bin/rofi-power')])):
             b = Gtk.Button(can_focus=False)

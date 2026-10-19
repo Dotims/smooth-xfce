@@ -24,7 +24,7 @@ screen, all in the Tokyo Night palette.
   button and one status button for Wi-Fi, Bluetooth, volume and battery.
 - **Quick settings**: click the status button. Tiles for Wi-Fi, Bluetooth, do not disturb and
   night light, network and device lists, sliders for volume (with the output picker), warmth and
-  brightness. Volume keys show an on-screen bar.
+  brightness, plus buttons for settings, lock, screen off and power. Volume keys show an on-screen bar.
 - **Calendar**: click the clock. Weeks start on Monday, Polish public holidays are red and the next
   day off sits at the bottom.
 - **Lock screen**: a live clock and a password field with dots, drawn by a small
