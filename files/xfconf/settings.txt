@@ -192,3 +192,4 @@ xfce4-keyboard-shortcuts|/xfwm4/custom/Up|up_key
 xfce4-keyboard-shortcuts|/xfwm4/custom/override|true
 xfce4-panel|/plugins/plugin-16/enable-mpris|
 xfce4-panel|/plugins/plugin-16/enable-multimedia-keys|
+xfce4-session|/general/LockCommand|@HOME@/.local/bin/lock-now
