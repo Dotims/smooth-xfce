@@ -69,6 +69,10 @@ cd smooth-xfce
 From the AUR: `bibata-cursor-theme-bin` for the cursor and `skippy-xd-git` for `Super+Tab`.
 Log out and back in once afterwards. The popups, lock screen, power menu and cheat sheet are in Polish.
 
+On a desktop (no battery) the script skips the touchpad gestures and the brightness slider, quick
+settings shows an Ethernet tile when there is no Wi-Fi, and `--panel` adds a menu, dock and clock
+on every extra monitor.
+
 After changing something on the desktop, `./snapshot.sh` copies the current look back into `files/`.
 
 ## Credits

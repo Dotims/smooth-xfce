@@ -12,6 +12,8 @@ from gi.repository import Gio, GLib, Gtk
 NIGHT_CFG = os.path.expanduser('~/.config/night-shift.json')
 TEMP_MIN, TEMP_MAX = 1000, 6500
 BAT = '/sys/class/power_supply/BAT0'
+# a desktop on a cable gets an Ethernet tile instead of Wi-Fi
+HAS_WIFI = any(os.path.exists(f'/sys/class/net/{d}/wireless') for d in os.listdir('/sys/class/net'))
 
 CSS = b"""
 .card { padding: 14px; min-width: 330px; }
@@ -187,7 +189,10 @@ class QuickSettings(Popup):
         card.pack_start(top, False, False, 0)
 
         grid = Gtk.Grid(column_homogeneous=True, row_spacing=8, column_spacing=8, margin_top=14)
-        self.wifi = Tile('\U000f05a9', 'Wi-Fi', self.toggle_wifi, lambda: self.show_list('wifi'))
+        if HAS_WIFI:
+            self.wifi = Tile('\U000f05a9', 'Wi-Fi', self.toggle_wifi, lambda: self.show_list('wifi'))
+        else:
+            self.wifi = Tile('\U000f0200', 'Ethernet', lambda: self.launch(['nm-connection-editor']))
         self.bt = Tile('\U000f00af', 'Bluetooth', self.toggle_bt, lambda: self.show_list('bt'))
         self.dnd = Tile('\U000f009b', 'Nie przeszkadzać', self.toggle_dnd)
         self.night = Tile('\U000f0594', 'Nocne światło', self.toggle_night)
@@ -233,7 +238,10 @@ class QuickSettings(Popup):
         if os.environ.get('QUICK_SETTINGS_DEMO'):
             return self.demo()
         self.read_battery()
-        sh(['nmcli', '-t', '-f', 'WIFI', 'general'], self.got_wifi_radio)
+        if HAS_WIFI:
+            sh(['nmcli', '-t', '-f', 'WIFI', 'general'], self.got_wifi_radio)
+        else:
+            sh(['nmcli', '-t', '-f', 'TYPE,STATE,CONNECTION', 'dev'], self.got_wired)
         sh(['bluetoothctl', 'show'], self.got_bt)
         sh(['xfconf-query', '-c', 'xfce4-notifyd', '-p', '/do-not-disturb'],
            lambda out: self.dnd.set(out.strip() == 'true', '\U000f009b' if out.strip() == 'true'
@@ -262,8 +270,11 @@ class QuickSettings(Popup):
             cap = int(open(f'{BAT}/capacity').read())
             status = open(f'{BAT}/status').read().strip()
         except OSError:
-            self.battery.set_text('Zasilanie z sieci')
-            self.battery_sub.set_text('')
+            # no battery: the computer's name and uptime
+            mins = int(float(open('/proc/uptime').read().split()[0])) // 60
+            self.battery.set_markup('<span font_family="JetBrainsMono Nerd Font Propo">\U000f01c5</span>  '
+                                    + GLib.markup_escape_text(os.uname().nodename))
+            self.battery_sub.set_text(f'działa od {mins // 60} h {mins % 60} min')
             return
         glyph = '\U000f0084' if status == 'Charging' else '\U000f0079'
         self.battery.set_markup(f'<span font_family="JetBrainsMono Nerd Font Propo">{glyph}</span>  {cap}%')
@@ -286,6 +297,11 @@ class QuickSettings(Popup):
             return
         sh(['nmcli', '-t', '-f', 'ACTIVE,SSID', 'dev', 'wifi', 'list', '--rescan', 'no'],
            self.got_wifi_active)
+
+    def got_wired(self, out):
+        conn = next((f[2] for f in map(nm_fields, out.splitlines())
+                     if len(f) == 3 and f[0] == 'ethernet' and f[1] == 'connected'), None)
+        self.wifi.set(bool(conn), '\U000f0200' if conn else '\U000f0319', 'Połączony' if conn else 'Rozłączony')
 
     def got_wifi_active(self, out):
         ssid = next((f[1] for f in map(nm_fields, out.splitlines()) if f[0] == 'yes'), None)

@@ -10,7 +10,7 @@ from gi.repository import Gio, GLib, Pango, PangoCairo, Rsvg
 
 OUT = os.path.join(os.environ.get('XDG_RUNTIME_DIR', '/tmp'), 'status-icons')
 # Adwaita's filled, rounded symbolic icons stay soft at 16 px; Qogir's thin outlines look jagged
-ICONS = ['/usr/share/icons/Adwaita/symbolic/status',
+ICONS = ['/usr/share/icons/Adwaita/symbolic/status', '/usr/share/icons/Adwaita/symbolic/devices',
          os.path.expanduser('~/.icons/Qogir-Dark/symbolic/status')]
 HEIGHT, ICON, GAP, BW = 24, 16, 13, 29
 WHITE = (0.91, 0.93, 0.98)
@@ -18,6 +18,7 @@ RED = (0xf7 / 255, 0x76 / 255, 0x8e / 255)
 GREEN = (0x9e / 255, 0xce / 255, 0x6a / 255)
 NAVY = (0x10 / 255, 0x11 / 255, 0x18 / 255)
 BAT = '/sys/class/power_supply/BAT0'
+NET = '/sys/class/net'
 
 
 def rounded(cr, x, y, w, h, r):
@@ -27,6 +28,18 @@ def rounded(cr, x, y, w, h, r):
     cr.arc(x + r, y + h - r, r, math.pi / 2, math.pi)
     cr.arc(x + r, y + r, r, math.pi, 3 * math.pi / 2)
     cr.close_path()
+
+
+def wired_up():
+    # physical ethernet only: virtual links (docker, bridges) have no device
+    for d in os.listdir(NET):
+        if os.path.exists(f'{NET}/{d}/device') and not os.path.exists(f'{NET}/{d}/wireless'):
+            try:
+                if open(f'{NET}/{d}/operstate').read().strip() == 'up':
+                    return True
+            except OSError:
+                pass
+    return False
 
 
 def icon_path(name):
@@ -99,7 +112,9 @@ class StatusBar:
 
     def update(self):
         q = self.wifi()
-        if q is None:
+        if q is None and wired_up():
+            wifi = 'network-wired-symbolic'
+        elif q is None:
             wifi = 'network-wireless-offline-symbolic'
         else:
             wifi = 'network-wireless-signal-' + ('excellent' if q >= 55 else 'good' if q >= 40

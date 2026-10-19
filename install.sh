@@ -12,11 +12,14 @@ T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
 cp -a "$HERE/files" "$T/" && F="$T/files"
 grep -rIl '@HOME@' "$F" | xargs -r sed -i "s|@HOME@|$HOME|g"
 
+# a laptop gets the touchpad gestures and the brightness slider, a desktop a panel per monitor
+LAPTOP=; ls /sys/class/power_supply/BAT* >/dev/null 2>&1 && LAPTOP=1
+
 echo "==> packages"
-sudo pacman -S --needed --noconfirm picom rofi starship xsecurelock mpv inter-font \
-  ttf-jetbrains-mono-nerd papirus-icon-theme xfce4-docklike-plugin python-pillow xdotool plymouth \
-  touchegg rofi-emoji rofi-calc playerctl wmctrl clipmenu xfce4-genmon-plugin xclip python-gobject python-cairo \
-  fastfetch btop brightnessctl redshift
+sudo pacman -S --needed --noconfirm picom rofi starship xsecurelock inter-font \
+  ttf-jetbrains-mono-nerd papirus-icon-theme xfce4-docklike-plugin python-pillow xdotool \
+  rofi-emoji rofi-calc playerctl wmctrl clipmenu xfce4-genmon-plugin xclip python-gobject python-cairo \
+  fastfetch btop redshift network-manager-applet ${LAPTOP:+touchegg brightnessctl}
 pacman -Q bibata-cursor-theme-bin >/dev/null 2>&1 || pacman -Q bibata-cursor-theme >/dev/null 2>&1 || \
   echo "!! install bibata-cursor-theme-bin from AUR for the cursor"
 
@@ -35,7 +38,14 @@ cp -a "$F/themes/cursor-index.theme" "$HOME/.icons/default/index.theme"
 cp -a "$F/bin/." "$HOME/.local/bin/"
 cp -a "$F/wallpapers/." "$HOME/Pictures/Wallpapers/"
 mkdir -p "$HOME/.local/share/desktop-look" && cp -a "$F/share/." "$HOME/.local/share/desktop-look/"
-gcc -O2 -o "$HOME/.local/bin/pinch-zoom" "$F/share/pinch-zoom.c" -lX11 -lXi -lm || echo "!! pinch-zoom build failed (needs gcc, libxi)"
+if [ -n "$LAPTOP" ]; then
+  gcc -O2 -o "$HOME/.local/bin/pinch-zoom" "$F/share/pinch-zoom.c" -lX11 -lXi -lm || echo "!! pinch-zoom build failed (needs gcc, libxi)"
+else
+  rm -f "$HOME/.config/autostart/pinch-zoom.desktop"
+fi
+# other picom autostarts would start a second compositor
+grep -l '^Exec=picom' "$HOME"/.config/autostart/*.desktop 2>/dev/null | grep -v '/picom.desktop$' | \
+  xargs -r -d '\n' sed -i '/^Hidden=/d; $a Hidden=true'
 mkdir -p "$HOME/.local/share/icons" && cp -a "$F/icons/." "$HOME/.local/share/icons/"
 mkdir -p "$HOME/.local/libexec" && cp -a "$F/libexec/." "$HOME/.local/libexec/"
 if [ ! -d "$HOME/.icons/Qogir-Dark" ] && [ ! -d /usr/share/icons/Qogir-Dark ]; then
@@ -44,6 +54,7 @@ if [ ! -d "$HOME/.icons/Qogir-Dark" ] && [ ! -d /usr/share/icons/Qogir-Dark ]; t
     (cd "$T/q" && ./install.sh -d "$HOME/.icons" >/dev/null) ; rm -rf "$T"
 fi
 fc-cache -f >/dev/null
+grep -q 'starship init bash' "$HOME/.bashrc" 2>/dev/null || echo 'eval "$(starship init bash)"' >> "$HOME/.bashrc"
 
 echo "==> xfconf"
 while IFS='|' read -r ch p v; do
@@ -59,7 +70,7 @@ echo "==> workspaces, gestures, clipboard history"
 xfconf-query -c xfwm4 -p /general/workspace_count -s 3
 xfconf-query -c xfwm4 -p /general/workspace_names -n -t string -t string -t string -s Praca -s Nauka -s Prywatne 2>/dev/null || \
   xfconf-query -c xfwm4 -p /general/workspace_names -t string -t string -t string -s Praca -s Nauka -s Prywatne
-sudo systemctl enable --now touchegg.service
+[ -n "$LAPTOP" ] && sudo systemctl enable --now touchegg.service
 systemctl --user daemon-reload && systemctl --user enable --now clipmenud.service
 
 echo "==> login screen + lock background"
@@ -82,8 +93,11 @@ fi
 
 if [ "${1:-}" = "--panel" ]; then
   echo "==> panel layout"
-  xfce4-panel -q; sleep 1
+  # xfconfd keeps the channel in memory and would write the old layout back
+  xfce4-panel -q; pkill -x xfconfd; sleep 1
   cp "$F/xfconf/xfce4-panel.xml" "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"
+  python3 "$F/share/panel_monitors.py" "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml" \
+    "$HOME/.config/xfce4/panel"
   setsid xfce4-panel >/dev/null 2>&1 &
 else
   xfce4-panel -r
@@ -98,6 +112,7 @@ setsid "$HOME/.local/bin/calendar-popup" --daemon >/dev/null 2>&1 < /dev/null &
 setsid "$HOME/.local/bin/quick-settings" --daemon >/dev/null 2>&1 < /dev/null &
 # nm-applet stays as the Wi-Fi password agent, as a hidden status notifier
 pkill -x nm-applet; setsid nm-applet --indicator >/dev/null 2>&1 < /dev/null &
+pkill -f '^/usr/bin/python /usr/bin/blueman-applet'; setsid blueman-applet >/dev/null 2>&1 < /dev/null &
 if pgrep -x flameshot >/dev/null; then pkill -x flameshot; sleep 1; setsid flameshot >/dev/null 2>&1 < /dev/null & fi
 
 if [ -x "$HOME/Applications/Handy.AppImage" ]; then
