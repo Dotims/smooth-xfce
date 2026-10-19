@@ -1,13 +1,10 @@
 #!/bin/bash
 # genmon: the status button image drawn by the quick settings daemon; click opens quick settings.
 # Always answer with an image: genmon that once got text at login never switched to the image.
+# Never start the daemon from here: it would inherit genmon's pipes and genmon would wait forever.
 d="${XDG_RUNTIME_DIR:-/tmp}/status-icons"
 img="$d/icons.png"
-if [ ! -f "$img" ]; then
-  pgrep -f '^python3 [^ ]*desktop-look/quick_settings.py' >/dev/null || \
-    setsid "$HOME/.local/bin/quick-settings" --daemon >/dev/null 2>&1 < /dev/null &
-  img="$HOME/.local/share/desktop-look/blank.png"
-fi
+[ -f "$img" ] || img="$HOME/.local/share/desktop-look/blank.png"
 echo "<img>$img</img>"
 echo "<click>$HOME/.local/bin/quick-settings</click>"
 echo "<tool>$(cat "$d/tooltip" 2>/dev/null)</tool>"

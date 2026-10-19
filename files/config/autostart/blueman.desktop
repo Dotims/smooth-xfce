@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Blueman Applet
+Exec=@HOME@/.local/bin/after-tray blueman-applet
+Icon=blueman
+X-GNOME-Autostart-enabled=true

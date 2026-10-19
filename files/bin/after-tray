@@ -1,0 +1,8 @@
+#!/bin/bash
+# Starts a tray applet once the panel's status notifier watcher is up; started earlier, nm-applet
+# and blueman fall back to legacy icons that the panel's hidden list cannot match.
+for _ in $(seq 60); do
+  busctl --user status org.kde.StatusNotifierWatcher >/dev/null 2>&1 && break
+  sleep 0.5
+done
+exec "$@"
