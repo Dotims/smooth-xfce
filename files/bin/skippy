@@ -1,0 +1,4 @@
+#!/bin/sh
+# skippy-xd with DISPLAY normalised: its client and daemon meet on a fifo named after DISPLAY,
+# and autostart, shortcuts and terminals hand out ":0" and ":0.0" differently.
+DISPLAY=${DISPLAY%.0} exec skippy-xd "$@"

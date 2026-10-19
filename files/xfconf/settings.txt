@@ -88,7 +88,7 @@ xfce4-keyboard-shortcuts|/commands/custom/<Super>2|@HOME@/.local/bin/ws 1
 xfce4-keyboard-shortcuts|/commands/custom/<Super>3|@HOME@/.local/bin/ws 2
 xfce4-keyboard-shortcuts|/commands/custom/<Super><Shift>v|xfce4-popup-clipman
 xfce4-keyboard-shortcuts|/commands/custom/<Super>Escape|rofi -show power -modi power:@HOME@/.local/bin/rofi-power
-xfce4-keyboard-shortcuts|/commands/custom/<Super>Tab|skippy-xd --expose
+xfce4-keyboard-shortcuts|/commands/custom/<Super>Tab|@HOME@/.local/bin/skippy --expose
 xfce4-keyboard-shortcuts|/commands/custom/<Super>a|@HOME@/.local/bin/airpods toggle
 xfce4-keyboard-shortcuts|/commands/custom/<Super>c|rofi -show calc -modi calc -no-show-match -no-sort -no-history -kb-accept-entry Control+Return -kb-accept-custom Return -calc-command "echo -n '{result}' | xclip -selection clipboard"
 xfce4-keyboard-shortcuts|/commands/custom/<Super>e|thunar

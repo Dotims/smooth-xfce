@@ -114,7 +114,7 @@ setsid "$HOME/.local/bin/quick-settings" --daemon >/dev/null 2>&1 < /dev/null &
 pkill -x nm-applet; setsid nm-applet --indicator >/dev/null 2>&1 < /dev/null &
 pkill -f '^/usr/bin/python /usr/bin/blueman-applet'; setsid blueman-applet >/dev/null 2>&1 < /dev/null &
 command -v skippy-xd >/dev/null && ! pgrep -x skippy-xd >/dev/null && \
-  setsid skippy-xd --start-daemon >/dev/null 2>&1 < /dev/null &
+  setsid "$HOME/.local/bin/skippy" --start-daemon >/dev/null 2>&1 < /dev/null &
 if pgrep -x flameshot >/dev/null; then pkill -x flameshot; sleep 1; setsid flameshot >/dev/null 2>&1 < /dev/null & fi
 
 if [ -x "$HOME/Applications/Handy.AppImage" ]; then

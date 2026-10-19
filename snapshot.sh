@@ -30,7 +30,7 @@ cp_rel flameshot/flameshot.ini
 tar -C "$HOME/.themes" -czf "$F/themes/themes.tar.gz" Qogir-Dark Qogir-Dark-Night Night-Glass
 cp -a "$HOME/.icons/default/index.theme" "$F/themes/cursor-index.theme"
 
-for b in lock-now lock-saver lock-bg-make handy-mono-tray ws grid-windows clipboard-menu rofi-power now-playing cheatsheet calendar-popup quick-settings status-icons volume after-tray; do cp -a "$HOME/.local/bin/$b" "$F/bin/"; done
+for b in lock-now lock-saver lock-bg-make handy-mono-tray ws grid-windows clipboard-menu rofi-power now-playing cheatsheet calendar-popup quick-settings status-icons volume after-tray skippy; do cp -a "$HOME/.local/bin/$b" "$F/bin/"; done
 cp -a "$HOME"/Pictures/Wallpapers/* "$F/wallpapers/"
 mkdir -p "$F/share" && cp -a "$HOME"/.local/share/desktop-look/*.py "$HOME"/.local/share/desktop-look/blank.png "$F/share/"
 cp -a "$HOME/.local/src/pinch-zoom/pinch-zoom.c" "$F/share/"
