@@ -16,6 +16,7 @@ cp_rel fontconfig/fonts.conf
 cp_rel xfce4/panel/docklike-2.rc
 cp_rel skippy-xd/skippy-xd.rc
 cp_rel touchegg/touchegg.conf
+cp_rel autostart/pinch-zoom.desktop
 cp_rel systemd/user/clipmenud.service.d/override.conf
 cp_rel autostart/skippy-xd.desktop
 cp_rel autostart/calendar-popup.desktop
@@ -31,6 +32,7 @@ cp -a "$HOME/.icons/default/index.theme" "$F/themes/cursor-index.theme"
 for b in lock-now lock-saver lock-bg-make handy-mono-tray ws grid-windows clipboard-menu rofi-power now-playing cheatsheet calendar-popup quick-settings status-icons volume; do cp -a "$HOME/.local/bin/$b" "$F/bin/"; done
 cp -a "$HOME"/Pictures/Wallpapers/* "$F/wallpapers/"
 mkdir -p "$F/share" && cp -a "$HOME"/.local/share/desktop-look/*.py "$HOME"/.local/share/desktop-look/blank.png "$F/share/"
+cp -a "$HOME/.local/src/pinch-zoom/pinch-zoom.c" "$F/share/"
 cp -a "$HOME/.local/share/icons/arch-menu.svg" "$F/icons/"
 cp -a "$HOME/.local/libexec/xsecurelock" "$F/libexec/"
 cp -a /etc/lightdm/lightdm-gtk-greeter.conf "$F/system/"

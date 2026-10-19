@@ -35,6 +35,7 @@ cp -a "$F/themes/cursor-index.theme" "$HOME/.icons/default/index.theme"
 cp -a "$F/bin/." "$HOME/.local/bin/"
 cp -a "$F/wallpapers/." "$HOME/Pictures/Wallpapers/"
 mkdir -p "$HOME/.local/share/desktop-look" && cp -a "$F/share/." "$HOME/.local/share/desktop-look/"
+gcc -O2 -o "$HOME/.local/bin/pinch-zoom" "$F/share/pinch-zoom.c" -lX11 -lXi -lm || echo "!! pinch-zoom build failed (needs gcc, libxi)"
 mkdir -p "$HOME/.local/share/icons" && cp -a "$F/icons/." "$HOME/.local/share/icons/"
 mkdir -p "$HOME/.local/libexec" && cp -a "$F/libexec/." "$HOME/.local/libexec/"
 if [ ! -d "$HOME/.icons/Qogir-Dark" ] && [ ! -d /usr/share/icons/Qogir-Dark ]; then

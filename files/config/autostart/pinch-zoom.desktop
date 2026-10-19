@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=pinch-zoom
+Comment=Touchpad pinch to smooth Ctrl+wheel zoom in Chrome
+Exec=@HOME@/.local/bin/pinch-zoom
+X-GNOME-Autostart-enabled=true
+NoDisplay=true
