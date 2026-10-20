@@ -538,3 +538,5 @@ window.xfce4-panel {
   border-radius: 0;
   border-width: 1px 0 0 0;
 }
+/* plugins run in their own wrapper windows, which stay clear unless styled like the bar */
+#XfcePanelWindowWrapper { background-color: rgba(26, 27, 38, 0.82); background-image: none; }
