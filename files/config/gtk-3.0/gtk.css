@@ -408,10 +408,10 @@ window.xfce4-panel {
 vte-terminal {
   padding: 10px 14px;
 }
-/* panel glass: slightly clearer now that picom blurs behind it */
+/* panel glass: opaque enough to read on a bright wallpaper even without blur */
 #XfcePanelWindow,
 window.xfce4-panel {
-  background-color: rgba(26, 27, 38, 0.66);
+  background-color: rgba(26, 27, 38, 0.82);
 }
 /* docklike: dots mark running apps, so no box around them; only hover/active get a soft fill */
 #docklike-plugin button,
