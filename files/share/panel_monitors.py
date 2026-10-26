@@ -41,7 +41,8 @@ def main(path, rcdir):
     by_id = {p.get('name').split('-')[1]: p for p in plugins.findall('property')
              if p.get('name', '').startswith('plugin-')}
     next_id = max(map(int, by_id)) + 1
-    rc = open(f'{rcdir}/docklike-2.rc').read().replace('onlyDisplayScreen=false', 'onlyDisplayScreen=true')
+    # every dock lists all windows, so clicking an app open on the other monitor raises it
+    rc = open(f'{rcdir}/docklike-2.rc').read().replace('onlyDisplayScreen=true', 'onlyDisplayScreen=false')
     open(f'{rcdir}/docklike-2.rc', 'w').write(rc)
     for n, (_, name, w, h, x, y) in enumerate(mons[1:], start=2):
         ET.SubElement(panels, 'value', type='int', value=str(n))
