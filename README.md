@@ -28,7 +28,7 @@ screen, all in the Tokyo Night palette.
   show an on-screen bar.
 - **Calendar**: click the clock. Weeks start on Monday, Polish public holidays are red and the next
   day off sits at the bottom. EN/PL in the corner (or the L key) switches its language.
-- **Lock screen**: a live clock and a password field with dots, drawn by a small
+- **Lock screen**: a live clock and a password field with dots on every monitor, drawn by a small
   [xsecurelock](https://github.com/google/xsecurelock) module. PAM still checks the password, and
   any error in the module switches back to the stock prompt.
 - **Launcher**: rofi in a Spotlight style with tabs for apps, windows, files, a calculator and emoji.

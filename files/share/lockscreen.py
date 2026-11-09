@@ -6,6 +6,7 @@
 # Any error in auth mode replaces this process with the stock auth_x11 prompt, so a bug here
 # never leaves the screen locked without a way in.
 import codecs
+import ctypes
 import datetime as dt
 import getpass
 import math
@@ -76,6 +77,75 @@ def rounded(cr, x, y, w, h, r):
     cr.close_path()
 
 
+class MonitorInfo(ctypes.Structure):
+    # XRRMonitorInfo from X11/extensions/Xrandr.h
+    _fields_ = [('name', ctypes.c_ulong), ('primary', ctypes.c_int), ('automatic', ctypes.c_int),
+                ('noutput', ctypes.c_int), ('x', ctypes.c_int), ('y', ctypes.c_int),
+                ('width', ctypes.c_int), ('height', ctypes.c_int), ('mwidth', ctypes.c_int),
+                ('mheight', ctypes.c_int), ('outputs', ctypes.POINTER(ctypes.c_ulong))]
+
+
+class RandR:
+    # the monitors xsecurelock covers; GTK leaves out one whose output reads disconnected for a moment
+    def __init__(self):
+        c = ctypes
+        x11, self.xrr = c.CDLL('libX11.so.6'), c.CDLL('libXrandr.so.2')
+        x11.XOpenDisplay.restype = c.c_void_p
+        x11.XOpenDisplay.argtypes = [c.c_char_p]
+        x11.XDefaultRootWindow.restype = c.c_ulong
+        x11.XDefaultRootWindow.argtypes = [c.c_void_p]
+        self.xrr.XRRQueryVersion.argtypes = [c.c_void_p, c.POINTER(c.c_int), c.POINTER(c.c_int)]
+        self.xrr.XRRGetMonitors.restype = c.POINTER(MonitorInfo)
+        self.xrr.XRRGetMonitors.argtypes = [c.c_void_p, c.c_ulong, c.c_int, c.POINTER(c.c_int)]
+        self.xrr.XRRFreeMonitors.argtypes = [c.POINTER(MonitorInfo)]
+        self.dpy = x11.XOpenDisplay(None)
+        major, minor = c.c_int(), c.c_int()
+        if not self.dpy or not self.xrr.XRRQueryVersion(self.dpy, c.byref(major), c.byref(minor)) \
+                or (major.value, minor.value) < (1, 5):
+            raise OSError('RandR 1.5 is not available')
+        self.root = x11.XDefaultRootWindow(self.dpy)
+
+    def monitors(self):
+        n = ctypes.c_int()
+        info = self.xrr.XRRGetMonitors(self.dpy, self.root, 1, ctypes.byref(n))
+        if not info:
+            return []
+        rects = [(info[i].x, info[i].y, info[i].width, info[i].height) for i in range(n.value)]
+        self.xrr.XRRFreeMonitors(info)
+        return rects
+
+
+def open_randr():
+    try:
+        return RandR()
+    except Exception:
+        traceback.print_exc()
+        return None
+
+
+def find_monitors(randr, w, h):
+    """Monitors on the w x h screen, clamped to it and without cloned copies, like xsecurelock."""
+    rects = []
+    if randr:
+        try:
+            scale = Gdk.get_default_root_window().get_scale_factor()
+            rects = [tuple(v // scale for v in r) for r in randr.monitors()]
+        except Exception:
+            traceback.print_exc()
+    if not rects:
+        display = Gdk.Display.get_default()
+        geos = [display.get_monitor(i).get_geometry() for i in range(display.get_n_monitors())]
+        rects = [(g.x, g.y, g.width, g.height) for g in geos]
+    out = []
+    for x, y, mw, mh in rects:
+        x0, y0 = min(max(x, 0), w), min(max(y, 0), h)
+        x1, y1 = min(max(x + mw, x0), w), min(max(y + mh, y0), h)
+        if x1 > x0 and y1 > y0 and not any(x0 < ox + ow and ox < x1 and y0 < oy + oh and oy < y1
+                                           for ox, oy, ow, oh in out):
+            out.append((x0, y0, x1 - x0, y1 - y0))
+    return sorted(out) or [(0, 0, w, h)]
+
+
 class LockScreen:
     def __init__(self, auth):
         self.auth = auth
@@ -94,9 +164,10 @@ class LockScreen:
         _, _, w, h = parent.get_geometry()
         self.parent = parent
         if auth:
-            _, _, w, h = Gdk.get_default_root_window().get_geometry()
-            rects = [display.get_monitor(i).get_geometry() for i in range(display.get_n_monitors())]
-            self.monitors = [(r.x, r.y, r.width, r.height) for r in rects] or [(0, 0, w, h)]
+            # one window over the whole screen, the prompt drawn on every monitor
+            self.randr = open_randr()
+            self.layout = self.screen_layout()
+            w, h, self.monitors = self.layout
         else:
             self.monitors = [(0, 0, w, h)]  # saver_multiplex gives each monitor its own window
 
@@ -241,7 +312,24 @@ class LockScreen:
         keymap = Gdk.Keymap.get_for_display(Gdk.Display.get_default())
         return keymap.get_caps_lock_state()
 
+    def screen_layout(self):
+        _, _, w, h = Gdk.get_default_root_window().get_geometry()
+        return w, h, find_monitors(self.randr, w, h)
+
+    def follow_monitors(self):
+        # a monitor can drop out or come back while the prompt is up
+        layout = self.screen_layout()
+        if layout == self.layout:
+            return
+        self.layout = layout
+        w, h, self.monitors = layout
+        self.win.set_size_request(w, h)
+        self.win.resize(w, h)
+        self.parent.move_resize(0, 0, w, h)
+
     def tick(self):
+        if self.auth:
+            self.follow_monitors()
         self.area.queue_draw()
         if self.auth and time.monotonic() - self.last_key > IDLE_EXIT and self.state != 'checking':
             self.quit(EXIT_FAIL)
