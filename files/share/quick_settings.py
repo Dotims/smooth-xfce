@@ -1,19 +1,31 @@
 #!/usr/bin/env python3
 # Quick settings popup: Wi-Fi, Bluetooth, do not disturb and night light tiles, sliders for
-# volume (with the output picker), warmth and brightness. `quick-settings` toggles it.
+# volume (with the output picker and a per-app mixer), warmth and brightness. `quick-settings`
+# toggles it.
 import json
 import os
 import re
+import time
 
+import gi
 from popup import Popup, label, run
 from status_bar import StatusBar
 from gi.repository import Gio, GLib, Gtk
+try:
+    gi.require_version('GioUnix', '2.0')
+    from gi.repository import GioUnix
+    DesktopAppInfo = GioUnix.DesktopAppInfo
+except (ImportError, ValueError):
+    DesktopAppInfo = Gio.DesktopAppInfo  # GLib before 2.86
 
 NIGHT_CFG = os.path.expanduser('~/.config/night-shift.json')
 TEMP_MIN, TEMP_MAX = 1000, 6500
 BAT = '/sys/class/power_supply/BAT0'
 # a desktop on a cable gets an Ethernet tile instead of Wi-Fi
 HAS_WIFI = any(os.path.exists(f'/sys/class/net/{d}/wireless') for d in os.listdir('/sys/class/net'))
+# external monitors have no backlight, so a desktop gets no brightness slider
+HAS_BACKLIGHT = os.path.isdir('/sys/class/backlight') and bool(os.listdir('/sys/class/backlight'))
+APPS = {}
 
 CSS = b"""
 .card { padding: 14px; min-width: 330px; }
@@ -50,6 +62,7 @@ scale trough {
   border-radius: 3px; min-height: 6px;
 }
 scale highlight { background-image: none; background-color: #7aa2f7; border: 0; border-radius: 3px; }
+.muted scale highlight { background-color: #565f89; }
 scale slider {
   background-image: none; background-color: #c0caf5; border: 0; border-radius: 8px;
   min-width: 16px; min-height: 16px; margin: -5px 0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
@@ -92,6 +105,37 @@ def nm_fields(line):
     return [f.replace('\\:', ':') for f in re.split(r'(?<!\\):', line)]
 
 
+def pactl_blocks(out, head):
+    """Splits `pactl list` output into (index, fields, properties) per object."""
+    blocks = []
+    for chunk in re.split(rf'^{head} #', out, flags=re.M)[1:]:
+        index, _, body = chunk.partition('\n')
+        blocks.append((int(index), dict(re.findall(r'^\t(\w[\w ]*): (.*)$', body, re.M)),
+                       dict(re.findall(r'^\t\t([\w.-]+) = "(.*)"$', body, re.M))))
+    return blocks
+
+
+def desktop_entry(desktop_id):
+    try:
+        return DesktopAppInfo.new(desktop_id)
+    except TypeError:  # no such launcher
+        return None
+
+
+def app_identity(binary, name):
+    """Name and icon for a sound stream's app, taken from its launcher when one matches."""
+    if (binary, name) not in APPS:
+        ids = dict.fromkeys(k.lower().replace(' ', '-') + '.desktop' for k in (binary, name) if k)
+        info = next(filter(None, map(desktop_entry, ids)), None)
+        if info is None and binary:
+            hits = DesktopAppInfo.search(binary)
+            info = desktop_entry(hits[0][0]) if hits and hits[0] else None
+        icon = info.get_icon() if info else None
+        fallback = Gio.ThemedIcon.new_from_names([(binary or name).lower(), 'audio-x-generic'])
+        APPS[binary, name] = (info.get_name() if info else name, icon or fallback)
+    return APPS[binary, name]
+
+
 class Tile(Gtk.Box):
     def __init__(self, glyph, title, on_toggle, on_more=None):
         super().__init__()
@@ -125,15 +169,15 @@ class Slider(Gtk.Box):
     def __init__(self, glyph, lo, hi, on_change, on_glyph=None, on_more=None):
         super().__init__(spacing=6)
         self.on_change = on_change
+        # a Nerd Font glyph, or a ready widget such as an app icon
+        self.glyph = glyph if isinstance(glyph, Gtk.Widget) else label('glyph row-glyph', glyph)
         if on_glyph:
             btn = Gtk.Button(can_focus=False)
             btn.get_style_context().add_class('row-btn')
-            self.glyph = label('glyph row-glyph', glyph)
             btn.add(self.glyph)
             btn.connect('clicked', lambda *_: on_glyph())
             self.pack_start(btn, False, False, 0)
         else:
-            self.glyph = label('glyph row-glyph', glyph)
             self.pack_start(self.glyph, False, False, 0)
         self.scale = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, lo, hi, 1)
         self.scale.set_draw_value(False)
@@ -147,11 +191,17 @@ class Slider(Gtk.Box):
             more.connect('clicked', lambda *_: on_more())
             self.pack_end(more, False, False, 0)
         self.pending = None
+        self.touched = 0.0
 
     def changed(self, scale):
         # apply at most every 80 ms while dragging
+        self.touched = time.monotonic()
         if self.pending is None:
             self.pending = GLib.timeout_add(80, self.flush)
+
+    def busy(self):
+        # the user is dragging it: outside updates would make the knob jump back
+        return self.pending is not None or time.monotonic() - self.touched < 1
 
     def flush(self):
         self.pending = None
@@ -161,6 +211,30 @@ class Slider(Gtk.Box):
     def set(self, value):
         with self.scale.handler_block(self.handler):
             self.scale.set_value(value)
+
+
+class AppRow(Gtk.Box):
+    """One app in the mixer: its name over a volume slider; the icon mutes it."""
+
+    def __init__(self, app, on_change, on_mute):
+        super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        self.app = app
+        name, icon = app_identity(app['binary'], app['name'])
+        self.pack_start(label('caption', name, xalign=0, margin_start=34, ellipsize=3), False, False, 0)
+        self.icon = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.LARGE_TOOLBAR)
+        self.icon.set_pixel_size(18)
+        self.slider = Slider(self.icon, 0, 100, lambda v: on_change(self, v),
+                             on_glyph=lambda: on_mute(self))
+        self.pack_start(self.slider, False, False, 0)
+        self.show_state()
+
+    def show_state(self):
+        if not self.slider.busy():
+            self.slider.set(min(self.app['volume'], 100))
+        muted = self.app['muted']
+        self.icon.set_opacity(0.4 if muted else 1)
+        ctx = self.get_style_context()
+        (ctx.add_class if muted else ctx.remove_class)('muted')
 
 
 class QuickSettings(Popup):
@@ -210,8 +284,9 @@ class QuickSettings(Popup):
         sliders.pack_start(self.volume, False, False, 0)
         self.warmth = Slider('\U000f0594', 0, TEMP_MAX - TEMP_MIN, self.set_warmth)
         sliders.pack_start(self.warmth, False, False, 0)
-        self.light = Slider('\U000f00df', 5, 100, self.set_brightness)
-        sliders.pack_start(self.light, False, False, 0)
+        self.light = Slider('\U000f00df', 5, 100, self.set_brightness) if HAS_BACKLIGHT else None
+        if self.light:
+            sliders.pack_start(self.light, False, False, 0)
         card.pack_start(sliders, False, False, 0)
 
         self.list_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=1)
@@ -220,6 +295,9 @@ class QuickSettings(Popup):
         self.revealer.add(self.list_box)
         card.pack_start(self.revealer, False, False, 0)
         self.list_kind = None
+        self.mixer = None
+        self.app_rows = {}
+        self.mixer_poll = None
         self.night_cfg = {'temp': 4500, 'on': False}
         self.status = StatusBar()
 
@@ -249,7 +327,8 @@ class QuickSettings(Popup):
                                     else 'Wyłączone'))
         self.read_night()
         self.read_sound()
-        sh(['brightnessctl', '-m', '-c', 'backlight'], self.got_brightness)
+        if self.light:
+            sh(['brightnessctl', '-m', '-c', 'backlight'], self.got_brightness)
 
     def demo(self):
         # fixed values for screenshots
@@ -263,7 +342,8 @@ class QuickSettings(Popup):
         self.volume.set(45)
         self.warmth.set(TEMP_MAX - 4500)
         self.warmth.show()
-        self.light.set(70)
+        if self.light:
+            self.light.set(70)
 
     def read_battery(self):
         try:
@@ -355,6 +435,7 @@ class QuickSettings(Popup):
         parts = out.strip().split(',')
         if len(parts) < 4:
             self.light.hide()
+            self.refit()
             return
         self.light.show()
         self.light.set(int(parts[3].rstrip('%')))
@@ -382,6 +463,7 @@ class QuickSettings(Popup):
         else:
             sh(['redshift', '-x'])
         self.read_night()
+        self.refit()  # the warmth slider comes and goes with it
 
     def set_warmth(self, value):
         self.night_cfg['temp'] = TEMP_MAX - value
@@ -401,6 +483,17 @@ class QuickSettings(Popup):
         sh(['pactl', 'set-sink-mute', '@DEFAULT_SINK@', 'toggle'],
            lambda _: sh(['pactl', 'get-sink-mute', '@DEFAULT_SINK@'], self.got_mute))
 
+    def set_app_volume(self, row, value):
+        row.app['volume'] = value
+        for stream in row.app['streams']:
+            sh(['pactl', 'set-sink-input-volume', str(stream), f'{value}%'])
+
+    def toggle_app_mute(self, row):
+        row.app['muted'] = not row.app['muted']
+        row.show_state()
+        for stream in row.app['streams']:
+            sh(['pactl', 'set-sink-input-mute', str(stream), '1' if row.app['muted'] else '0'])
+
     def set_brightness(self, value):
         sh(['brightnessctl', '-q', '-c', 'backlight', 'set', f'{value}%'])
 
@@ -412,6 +505,7 @@ class QuickSettings(Popup):
     def show_list(self, kind):
         if self.list_kind == kind and self.revealer.get_reveal_child():
             self.revealer.set_reveal_child(False)
+            self.follow(self.revealer)
             self.list_kind = None
             return
         self.list_kind = kind
@@ -423,10 +517,7 @@ class QuickSettings(Popup):
                lambda paired: sh(['bluetoothctl', 'devices', 'Connected'],
                                  lambda conn: self.fill_bt(paired, conn)))
         else:
-            self.fill_list('Wyjście dźwięku', [
-                (s.get('description', s['name']), '', s['name'] == getattr(self, 'default_sink', ''),
-                 lambda n=s['name']: sh(['pactl', 'set-default-sink', n], lambda _: self.read_sound()))
-                for s in getattr(self, 'sinks', [])])
+            self.read_mixer(self.fill_sound)
 
     def fill_wifi(self, out):
         seen, rows = set(), []
@@ -454,12 +545,37 @@ class QuickSettings(Popup):
                                                    lambda _: self.refresh_soon())))
         self.fill_list('Urządzenia', rows)
 
+    def fill_sound(self, apps):
+        if self.list_kind != 'sinks':
+            return  # collapsed or switched before pactl answered
+        self.clear_list()
+        self.add_rows('Wyjście dźwięku', [
+            (s.get('description', s['name']), '', s['name'] == getattr(self, 'default_sink', ''),
+             lambda n=s['name']: sh(['pactl', 'set-default-sink', n], lambda _: self.read_sound()))
+            for s in getattr(self, 'sinks', [])])
+        self.list_box.pack_start(label('list-title', 'APLIKACJE', xalign=0, margin_top=14,
+                                       margin_bottom=6, margin_start=8), False, False, 0)
+        self.mixer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        self.list_box.pack_start(self.mixer, False, False, 0)
+        self.fill_mixer(apps)
+        self.reveal_list()
+        if self.mixer_poll is None:
+            # apps start and stop playing while the list is open
+            self.mixer_poll = GLib.timeout_add(1500, self.poll_mixer)
+
     def fill_list(self, title, rows):
+        self.clear_list()
+        self.add_rows(title, rows)
+        self.reveal_list()
+
+    def clear_list(self):
         for child in self.list_box.get_children():
             child.destroy()
         self.list_box.pack_start(Gtk.Box(margin_top=12), False, False, 0)
         rule = Gtk.Box(); rule.get_style_context().add_class('rule')
         self.list_box.pack_start(rule, False, False, 0)
+
+    def add_rows(self, title, rows):
         self.list_box.pack_start(label('list-title', title.upper(), xalign=0, margin_top=10,
                                        margin_bottom=4, margin_start=8), False, False, 0)
         if not rows:
@@ -476,9 +592,72 @@ class QuickSettings(Popup):
             b.add(box)
             b.connect('clicked', lambda _b, a=action: a())
             self.list_box.pack_start(b, False, False, 0)
+
+    def reveal_list(self):
         self.list_box.show_all()
         self.revealer.set_reveal_child(True)
-        GLib.timeout_add(160, lambda: (self.place(), False)[1])
+        self.follow(self.revealer)
+
+    # --- per-app volume ------------------------------------------------------------------------
+
+    def read_mixer(self, done):
+        sh(['pactl', 'list', 'sink-inputs'],
+           lambda inputs: sh(['pactl', 'list', 'clients'],
+                             lambda clients: done(self.mixer_apps(inputs, clients))))
+
+    def mixer_apps(self, inputs, clients):
+        """Playback streams grouped per program, like the Windows mixer: one slider per app."""
+        owners = {i: props for i, _, props in pactl_blocks(clients, 'Client')}
+        apps = {}
+        for index, fields, props in pactl_blocks(inputs, 'Sink Input'):
+            # the EQ's own loopback and short event sounds are not apps
+            if props.get('node.virtual') == 'true' or props.get('media.role') == 'event':
+                continue
+            client = fields.get('Client', '')
+            owner = owners.get(int(client), {}) if client.isdigit() else {}
+            binary = owner.get('application.process.binary', '')
+            name = props.get('application.name') or owner.get('application.name') or binary
+            if not name:
+                continue
+            # one row per program; interpreters run many apps, so those go by the app's name
+            key = name.lower() if not binary or binary.startswith('python') else binary.lower()
+            app = apps.setdefault(key, {'key': key, 'binary': binary, 'name': name, 'streams': [],
+                                        'volume': 0, 'muted': True})
+            app['streams'].append(index)
+            app['volume'] = max([app['volume'], *map(int, re.findall(r'(\d+)%', fields.get('Volume', '')))])
+            app['muted'] = app['muted'] and fields.get('Mute') == 'yes'
+        return list(apps.values())
+
+    def fill_mixer(self, apps):
+        for child in self.mixer.get_children():
+            child.destroy()
+        self.app_rows = {}
+        if not apps:
+            self.mixer.pack_start(label('caption', 'Teraz nic nie gra', xalign=0, margin_start=8),
+                                  False, False, 0)
+        for app in apps:
+            row = self.app_rows[app['key']] = AppRow(app, self.set_app_volume, self.toggle_app_mute)
+            self.mixer.pack_start(row, False, False, 0)
+        self.mixer.show_all()
+
+    def poll_mixer(self):
+        if self.list_kind != 'sinks' or not self.win.get_visible():
+            self.mixer_poll = None
+            return False
+        self.read_mixer(self.update_mixer)
+        return True
+
+    def update_mixer(self, apps):
+        if self.list_kind != 'sinks':
+            return
+        if [app['key'] for app in apps] != list(self.app_rows):
+            self.fill_mixer(apps)
+            self.refit()
+            return
+        for app in apps:
+            row = self.app_rows[app['key']]
+            row.app = app
+            row.show_state()
 
 
 if __name__ == '__main__':

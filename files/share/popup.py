@@ -26,6 +26,7 @@ class Popup(Gtk.Application):
         super().__init__(application_id=self.APP_ID)
         self.hidden = hidden
         self.win = None
+        self.anchor = None
 
     # subclasses fill the card and refresh it before every open
     def build(self, card):
@@ -57,6 +58,7 @@ class Popup(Gtk.Application):
         w.connect('key-press-event', self._key)
         w.connect('scroll-event', lambda _w, ev: self.on_scroll(ev))
         w.connect('grab-broken-event', lambda *_: self.close())
+        w.connect('size-allocate', lambda _w, a: self._pin(a.width, a.height))
         self.add_window(w)
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         card.get_style_context().add_class('card')
@@ -79,20 +81,42 @@ class Popup(Gtk.Application):
         GLib.timeout_add(30, self._grab, 10)
 
     def place(self):
-        # above the clicked panel item, kept inside the screen
+        # above the clicked panel item, kept inside the screen; while open only the size is refitted
         w = self.win
         w.resize(1, 1)
-        _, size = w.get_preferred_size()
-        display = Gdk.Display.get_default()
         if w.get_visible():
-            # content changed while open: keep the column, grow upwards
-            px, py = self.anchor
-        else:
-            _, px, py = display.get_default_seat().get_pointer().get_position()
-            self.anchor = (px, py)
-        area = display.get_monitor_at_point(px, py).get_workarea()
-        x = min(max(px - size.width // 2, area.x + 10), area.x + area.width - size.width - 10)
-        w.move(x, area.y + area.height - size.height - 10)
+            return
+        display = Gdk.Display.get_default()
+        _, px, py = display.get_default_seat().get_pointer().get_position()
+        self.anchor = (px, work_area(display, display.get_monitor_at_point(px, py)))
+        size, _ = w.get_preferred_size()  # resize(1, 1) leaves the window at its minimum size
+        w.move(*self._spot(size.width, size.height))
+        self._pin(size.width, size.height)
+
+    def refit(self):
+        # shrink to the content after something was hidden; the bottom edge stays put
+        self.win.resize(1, 1)
+
+    def follow(self, revealer):
+        # refit on every frame of a revealer's slide, so the card grows and shrinks smoothly
+        def step(*_):
+            self.win.resize(1, 1)
+            return revealer.get_child_revealed() != revealer.get_reveal_child()
+        self.win.add_tick_callback(step)
+
+    def _spot(self, width, height):
+        px, area = self.anchor
+        x = min(max(px - width // 2, area.x + 10), area.x + area.width - width - 10)
+        return x, area.y + area.height - height - 10
+
+    def _pin(self, width, height):
+        # GTK resizes from the top-left corner and skips a move to the position it last asked for,
+        # even when the window was moved since, so the X window is placed directly
+        gw = self.win.get_window()
+        if gw is not None and self.anchor is not None:
+            spot = self._spot(width, height)
+            if tuple(gw.get_position()) != spot:
+                gw.move(*spot)
 
     def _grab(self, tries):
         gw = self.win.get_window()
@@ -119,6 +143,16 @@ class Popup(Gtk.Application):
             self.close()
             return True
         return self.on_key(ev.keyval)
+
+
+def work_area(display, monitor):
+    # GDK applies the panel struts to the primary monitor only; the other monitors carry copies
+    area = monitor.get_workarea()
+    primary = display.get_primary_monitor()
+    if primary is not None and monitor != primary and area.equal(monitor.get_geometry()):
+        geo, work = primary.get_geometry(), primary.get_workarea()
+        area.height -= geo.y + geo.height - work.y - work.height
+    return area
 
 
 def label(cls, text='', **props):
