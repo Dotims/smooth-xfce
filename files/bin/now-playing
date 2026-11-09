@@ -8,4 +8,4 @@ line=$(printf '%s' "$line" | esc)
 if [ "$st" = Playing ]; then icon="♪"; color="#c0caf5"; else icon="⏸"; color="#7a83ad"; fi
 echo "<txt><span font='Inter Medium 10' foreground='$color'>$icon  $line</span></txt>"
 echo "<txtclick>playerctl -p spotify play-pause</txtclick>"
-printf '<tool>%s\n%s\n\nKlik: pauza / wznów. Następny i poprzedni: klawisze multimedialne albo menu głośnika.</tool>\n' "$(printf '%s' "$t" | esc)" "$(printf '%s' "$a" | esc)"
+printf '<tool>%s\n%s\n\nClick: pause / play. Next and previous: media keys.</tool>\n' "$(printf '%s' "$t" | esc)" "$(printf '%s' "$a" | esc)"

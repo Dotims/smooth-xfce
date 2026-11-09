@@ -268,8 +268,8 @@ class QuickSettings(Popup):
         else:
             self.wifi = Tile('\U000f0200', 'Ethernet', lambda: self.launch(['nm-connection-editor']))
         self.bt = Tile('\U000f00af', 'Bluetooth', self.toggle_bt, lambda: self.show_list('bt'))
-        self.dnd = Tile('\U000f009b', 'Nie przeszkadzać', self.toggle_dnd)
-        self.night = Tile('\U000f0594', 'Nocne światło', self.toggle_night)
+        self.dnd = Tile('\U000f009b', 'Do Not Disturb', self.toggle_dnd)
+        self.night = Tile('\U000f0594', 'Night Light', self.toggle_night)
         grid.attach(self.wifi, 0, 0, 1, 1)
         grid.attach(self.bt, 1, 0, 1, 1)
         grid.attach(self.dnd, 0, 1, 1, 1)
@@ -323,8 +323,8 @@ class QuickSettings(Popup):
         sh(['bluetoothctl', 'show'], self.got_bt)
         sh(['xfconf-query', '-c', 'xfce4-notifyd', '-p', '/do-not-disturb'],
            lambda out: self.dnd.set(out.strip() == 'true', '\U000f009b' if out.strip() == 'true'
-                                    else '\U000f009a', 'Włączone' if out.strip() == 'true'
-                                    else 'Wyłączone'))
+                                    else '\U000f009a', 'On' if out.strip() == 'true'
+                                    else 'Off'))
         self.read_night()
         self.read_sound()
         if self.light:
@@ -333,10 +333,10 @@ class QuickSettings(Popup):
     def demo(self):
         # fixed values for screenshots
         self.battery.set_markup('<span font_family="JetBrainsMono Nerd Font Propo">\U000f0082</span>  86%')
-        self.battery_sub.set_text('zostało 4 h 12 min')
+        self.battery_sub.set_text('4 h 12 min left')
         self.wifi.set(True, '\U000f05a9', 'Home')
         self.bt.set(True, '\U000f00b1', 'AirPods Pro')
-        self.dnd.set(False, '\U000f009a', 'Wyłączone')
+        self.dnd.set(False, '\U000f009a', 'Off')
         self.night.set(True, '\U000f0594', '4500 K')
         self.sink_caption.set_text('AirPods Pro')
         self.volume.set(45)
@@ -354,12 +354,12 @@ class QuickSettings(Popup):
             mins = int(float(open('/proc/uptime').read().split()[0])) // 60
             self.battery.set_markup('<span font_family="JetBrainsMono Nerd Font Propo">\U000f01c5</span>  '
                                     + GLib.markup_escape_text(os.uname().nodename))
-            self.battery_sub.set_text(f'działa od {mins // 60} h {mins % 60} min')
+            self.battery_sub.set_text(f'up {mins // 60} h {mins % 60} min')
             return
         glyph = '\U000f0084' if status == 'Charging' else '\U000f0079'
         self.battery.set_markup(f'<span font_family="JetBrainsMono Nerd Font Propo">{glyph}</span>  {cap}%')
-        self.battery_sub.set_text({'Charging': 'ładowanie', 'Full': 'naładowana',
-                                   'Not charging': 'podłączona'}.get(status, 'na baterii'))
+        self.battery_sub.set_text({'Charging': 'charging', 'Full': 'full',
+                                   'Not charging': 'plugged in'}.get(status, 'on battery'))
         if status == 'Discharging':
             sh(['upower', '-i', '/org/freedesktop/UPower/devices/battery_BAT0'], self.got_upower)
 
@@ -369,11 +369,11 @@ class QuickSettings(Popup):
             return
         value = float(m.group(1).replace(',', '.'))
         mins = int(value * 60) if m.group(2).startswith('hour') else int(value)
-        self.battery_sub.set_text(f'zostało {mins // 60} h {mins % 60} min')
+        self.battery_sub.set_text(f'{mins // 60} h {mins % 60} min left')
 
     def got_wifi_radio(self, out):
         if out.strip() != 'enabled':
-            self.wifi.set(False, '\U000f05aa', 'Wyłączone')
+            self.wifi.set(False, '\U000f05aa', 'Off')
             return
         sh(['nmcli', '-t', '-f', 'ACTIVE,SSID', 'dev', 'wifi', 'list', '--rescan', 'no'],
            self.got_wifi_active)
@@ -381,15 +381,16 @@ class QuickSettings(Popup):
     def got_wired(self, out):
         conn = next((f[2] for f in map(nm_fields, out.splitlines())
                      if len(f) == 3 and f[0] == 'ethernet' and f[1] == 'connected'), None)
-        self.wifi.set(bool(conn), '\U000f0200' if conn else '\U000f0319', 'Połączony' if conn else 'Rozłączony')
+        self.wifi.set(bool(conn), '\U000f0200' if conn else '\U000f0319',
+                      'Connected' if conn else 'Disconnected')
 
     def got_wifi_active(self, out):
         ssid = next((f[1] for f in map(nm_fields, out.splitlines()) if f[0] == 'yes'), None)
-        self.wifi.set(True, '\U000f05a9', ssid or 'Niepołączone')
+        self.wifi.set(True, '\U000f05a9', ssid or 'Not connected')
 
     def got_bt(self, out):
         if 'Powered: yes' not in out:
-            self.bt.set(False, '\U000f00b2', 'Wyłączony')
+            self.bt.set(False, '\U000f00b2', 'Off')
             return
         sh(['bluetoothctl', 'devices', 'Connected'], self.got_bt_connected)
 
@@ -397,7 +398,7 @@ class QuickSettings(Popup):
         names = [line.split(' ', 2)[2] for line in out.splitlines()
                  if line.startswith('Device ') and len(line.split(' ', 2)) == 3]
         self.bt.set(True, '\U000f00b1' if names else '\U000f00af',
-                    ', '.join(names) if names else 'Włączony')
+                    ', '.join(names) if names else 'On')
 
     def read_night(self):
         try:
@@ -405,7 +406,7 @@ class QuickSettings(Popup):
         except (OSError, ValueError):
             pass
         on, temp = self.night_cfg.get('on'), self.night_cfg.get('temp', 4500)
-        self.night.set(bool(on), '\U000f0594', f'{temp} K' if on else 'Wyłączone')
+        self.night.set(bool(on), '\U000f0594', f'{temp} K' if on else 'Off')
         self.warmth.set(TEMP_MAX - temp)
         self.warmth.set_visible(bool(on))
 
@@ -529,7 +530,7 @@ class QuickSettings(Popup):
             rows.append((f[1], meta, f[0] == 'yes',
                          lambda s=f[1]: sh(['nmcli', 'dev', 'wifi', 'connect', s],
                                            lambda _: self.refresh_soon())))
-        self.fill_list('Sieci', rows[:7])
+        self.fill_list('Networks', rows[:7])
 
     def fill_bt(self, paired, connected):
         conn = {line.split(' ', 2)[1] for line in connected.splitlines() if line.startswith('Device ')}
@@ -540,20 +541,20 @@ class QuickSettings(Popup):
                 continue
             mac, name = parts[1], parts[2]
             is_on = mac in conn
-            rows.append((name, 'połączono' if is_on else '', is_on,
+            rows.append((name, 'connected' if is_on else '', is_on,
                          lambda m=mac, c=is_on: sh(['bluetoothctl', 'disconnect' if c else 'connect', m],
                                                    lambda _: self.refresh_soon())))
-        self.fill_list('Urządzenia', rows)
+        self.fill_list('Devices', rows)
 
     def fill_sound(self, apps):
         if self.list_kind != 'sinks':
             return  # collapsed or switched before pactl answered
         self.clear_list()
-        self.add_rows('Wyjście dźwięku', [
+        self.add_rows('Sound output', [
             (s.get('description', s['name']), '', s['name'] == getattr(self, 'default_sink', ''),
              lambda n=s['name']: sh(['pactl', 'set-default-sink', n], lambda _: self.read_sound()))
             for s in getattr(self, 'sinks', [])])
-        self.list_box.pack_start(label('list-title', 'APLIKACJE', xalign=0, margin_top=14,
+        self.list_box.pack_start(label('list-title', 'APPS', xalign=0, margin_top=14,
                                        margin_bottom=6, margin_start=8), False, False, 0)
         self.mixer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         self.list_box.pack_start(self.mixer, False, False, 0)
@@ -579,7 +580,7 @@ class QuickSettings(Popup):
         self.list_box.pack_start(label('list-title', title.upper(), xalign=0, margin_top=10,
                                        margin_bottom=4, margin_start=8), False, False, 0)
         if not rows:
-            self.list_box.pack_start(label('caption', 'Nic tu nie ma', xalign=0, margin_start=8),
+            self.list_box.pack_start(label('caption', 'Nothing here', xalign=0, margin_start=8),
                                      False, False, 0)
         for name, meta, current, action in rows:
             b = Gtk.Button(can_focus=False)
@@ -633,7 +634,7 @@ class QuickSettings(Popup):
             child.destroy()
         self.app_rows = {}
         if not apps:
-            self.mixer.pack_start(label('caption', 'Teraz nic nie gra', xalign=0, margin_start=8),
+            self.mixer.pack_start(label('caption', 'Nothing is playing', xalign=0, margin_start=8),
                                   False, False, 0)
         for app in apps:
             row = self.app_rows[app['key']] = AppRow(app, self.set_app_volume, self.toggle_app_mute)

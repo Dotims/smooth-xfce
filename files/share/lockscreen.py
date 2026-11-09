@@ -40,9 +40,9 @@ BG = os.path.expanduser('~/.cache/lock-bg.png')
 AUTHPROTO = os.environ.get('XSECURELOCK_AUTHPROTO') or '/usr/lib/xsecurelock/authproto_pam'
 IDLE_EXIT = 60  # seconds without a key before the prompt gives up
 
-MONTHS_OF = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia',
-             'września', 'października', 'listopada', 'grudnia']
-WEEKDAYS = ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela']
+MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+          'October', 'November', 'December']
+WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 FG = (0xc0 / 255, 0xca / 255, 0xf5 / 255)
 FG_DIM = (0xa9 / 255, 0xb1 / 255, 0xd6 / 255)
@@ -160,7 +160,7 @@ class LockScreen:
 
         top = h * 0.17
         top += text(cr, now.strftime('%H:%M'), 'Inter Display SemiBold', 128 * s, (*FG, 0.96), cx, top)
-        date = f'{WEEKDAYS[now.weekday()]}, {now.day} {MONTHS_OF[now.month - 1]}'
+        date = f'{WEEKDAYS[now.weekday()]}, {now.day} {MONTHS[now.month - 1]}'
         text(cr, date, 'Inter Medium', 22 * s, (*FG_DIM, 0.9), cx, top - 6 * s)
 
         # avatar: initial on the accent gradient
@@ -196,7 +196,7 @@ class LockScreen:
 
         n = len(self.chars)
         if n == 0:
-            hint = 'Sprawdzanie…' if self.state == 'checking' else 'Wpisz hasło'
+            hint = 'Checking…' if self.state == 'checking' else 'Enter password'
             text(cr, hint, 'Inter', 15 * s, (*FG, 0.45), px + pw / 2, py + 10 * s)
         else:
             gap, dr = 14 * s, 4 * s
@@ -232,9 +232,9 @@ class LockScreen:
             msg, rgb = self.message
             text(cr, msg, 'Inter Medium', 14 * s, (*rgb, 1), cx, my)
         elif self.caps_lock():
-            text(cr, 'Caps Lock jest włączony', 'Inter Medium', 14 * s, (*AMBER, 1), cx, my)
+            text(cr, 'Caps Lock is on', 'Inter Medium', 14 * s, (*AMBER, 1), cx, my)
 
-        hint = 'Enter odblokowuje · Esc anuluje' if self.auth else 'Zacznij pisać, aby odblokować'
+        hint = 'Enter unlocks · Esc cancels' if self.auth else 'Start typing to unlock'
         text(cr, hint, 'Inter', 13 * s, (*FG_DIM, 0.55), cx, h - 64 * s)
 
     def caps_lock(self):
@@ -372,7 +372,7 @@ class Auth(LockScreen):
             self.prompted = True
             self.send_password()
         elif kind == 'e':
-            text_ = 'Złe hasło' if 'failure' in msg.lower() else msg
+            text_ = 'Wrong password' if 'failure' in msg.lower() else msg
             self.message = (text_, RED)
         elif kind == 'i':
             self.message = (msg, FG_DIM)
@@ -392,7 +392,7 @@ class Auth(LockScreen):
         self.chars.clear()
         self.submitted = False
         if not self.message or self.message[1] != RED:
-            self.message = ('Złe hasło, spróbuj jeszcze raz', RED)
+            self.message = ('Wrong password, try again', RED)
         self.shake_start = time.monotonic()
         self.animate(0.5)
 

@@ -1,15 +1,15 @@
 #!/bin/bash
 # rofi script mode: power menu with confirmation for restart/shutdown/logout.
 case "$*" in
-  "") printf '%s\n' "󰌾  Zablokuj" "󰒲  Uśpij" "󰋊  Hibernuj" "󰍃  Wyloguj" "󰜉  Uruchom ponownie" "󰐥  Wyłącz";;
-  *Zablokuj) setsid ~/.local/bin/lock-now >/dev/null 2>&1 & ;;
-  *Uśpij) systemctl suspend ;;
-  *Hibernuj) systemctl hibernate ;;
-  *"Wyloguj") printf '%s\n' "Tak, wyloguj" "Anuluj";;
-  *"Uruchom ponownie") printf '%s\n' "Tak, uruchom ponownie" "Anuluj";;
-  *"Wyłącz") printf '%s\n' "Tak, wyłącz" "Anuluj";;
-  "Tak, wyloguj") xfce4-session-logout --logout --fast >/dev/null 2>&1 & ;;
-  "Tak, uruchom ponownie") systemctl reboot ;;
-  "Tak, wyłącz") systemctl poweroff ;;
+  "") printf '%s\n' "󰌾  Lock" "󰒲  Suspend" "󰋊  Hibernate" "󰍃  Log out" "󰜉  Restart" "󰐥  Shut down";;
+  *Lock) setsid ~/.local/bin/lock-now >/dev/null 2>&1 & ;;
+  *Suspend) systemctl suspend ;;
+  *Hibernate) systemctl hibernate ;;
+  *"Log out") printf '%s\n' "Yes, log out" "Cancel";;
+  *Restart) printf '%s\n' "Yes, restart" "Cancel";;
+  *"Shut down") printf '%s\n' "Yes, shut down" "Cancel";;
+  "Yes, log out") xfce4-session-logout --logout --fast >/dev/null 2>&1 & ;;
+  "Yes, restart") systemctl reboot ;;
+  "Yes, shut down") systemctl poweroff ;;
   *) ;;
 esac

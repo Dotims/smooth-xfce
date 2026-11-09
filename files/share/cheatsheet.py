@@ -5,41 +5,41 @@ gi.require_version('Gtk', '3.0'); gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk, Gdk
 
 SECTIONS = [
-  ("Okna", [
-    ("Super+Tab", "wszystkie okna naraz"),
-    ("Alt+Tab", "przełączanie, też zminimalizowanych"),
-    ("Super+← / →", "okno na pół ekranu"),
-    ("Super+U  I  J  K", "okno w róg ekranu"),
-    ("Super+G", "ułóż wszystkie okna w siatkę"),
-    ("Super+↑ / ↓", "maksymalizuj / zminimalizuj"),
-    ("Super+D", "pokaż pulpit"),
+  ("Windows", [
+    ("Super+Tab", "all windows at once"),
+    ("Alt+Tab", "switch windows, minimized ones too"),
+    ("Super+← / →", "window to half of the screen"),
+    ("Super+U  I  J  K", "window to a corner"),
+    ("Super+G", "arrange all windows in a grid"),
+    ("Super+↑ / ↓", "maximize / minimize"),
+    ("Super+D", "show desktop"),
   ]),
-  ("Pulpity", [
-    ("Super+1  2  3", "Praca / Nauka / Prywatne"),
-    ("Super+Shift+1  2  3", "przenieś okno na pulpit"),
+  ("Workspaces", [
+    ("Super+1  2  3", "Work / Study / Personal"),
+    ("Super+Shift+1  2  3", "move the window to a workspace"),
   ]),
-  ("Szukanie i narzędzia", [
-    ("Super+Spacja", "wyszukiwarka, Tab zmienia zakładkę"),
-    ("Super+V", "historia schowka"),
+  ("Search and tools", [
+    ("Super+Space", "launcher, Tab switches tabs"),
+    ("Super+V", "clipboard history"),
     ("Super+;", "emoji"),
-    ("Super+C", "kalkulator, Enter kopiuje wynik"),
-    ("Super+`", "terminal z góry ekranu"),
-    ("Super+T  /  Super+E", "terminal / pliki"),
-    ("Super", "menu aplikacji"),
+    ("Super+C", "calculator, Enter copies the result"),
+    ("Super+`", "drop-down terminal"),
+    ("Super+T  /  Super+E", "terminal / files"),
+    ("Super", "app menu"),
   ]),
   ("System", [
-    ("Super+L", "zablokuj ekran"),
-    ("Super+Esc", "zablokuj, uśpij, uruchom ponownie"),
-    ("Ctrl+Shift+S", "zrzut obszaru do pliku"),
-    ("Super+Shift+S", "zrzut obszaru do schowka"),
-    ("Super+A", "AirPods: połącz / rozłącz"),
-    ("Super+/", "ta ściąga"),
+    ("Super+L", "lock the screen"),
+    ("Super+Esc", "lock, suspend, restart"),
+    ("Ctrl+Shift+S", "screenshot of an area to a file"),
+    ("Super+Shift+S", "screenshot of an area to the clipboard"),
+    ("Super+A", "AirPods: connect / disconnect"),
+    ("Super+/", "this cheat sheet"),
   ]),
-  ("Gesty touchpada", [
-    ("3 palce ↑", "wszystkie okna naraz"),
-    ("3 palce ↓", "pokaż pulpit"),
-    ("4 palce ← →", "następny / poprzedni pulpit"),
-    ("4 palce ↑", "okna ze wszystkich pulpitów"),
+  ("Touchpad gestures", [
+    ("3 fingers ↑", "all windows at once"),
+    ("3 fingers ↓", "show desktop"),
+    ("4 fingers ← →", "next / previous workspace"),
+    ("4 fingers ↑", "windows from all workspaces"),
   ]),
 ]
 
@@ -55,7 +55,7 @@ css = b"""
 p = Gtk.CssProvider(); p.load_from_data(css)
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), p, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION + 10)
 
-w = Gtk.Window(title="Skróty")
+w = Gtk.Window(title="Shortcuts")
 w.set_decorated(False); w.set_keep_above(True); w.set_skip_taskbar_hint(True); w.set_skip_pager_hint(True)
 w.set_type_hint(Gdk.WindowTypeHint.DIALOG); w.set_position(Gtk.WindowPosition.CENTER)
 vis = w.get_screen().get_rgba_visual()
@@ -65,8 +65,8 @@ w.connect('draw', lambda wid, cr: (cr.set_source_rgba(0, 0, 0, 0), cr.set_operat
 
 outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18); outer.set_name('sheet')
 head = Gtk.Box(spacing=12)
-t = Gtk.Label(label="Skróty i gesty"); t.set_name('title'); t.set_xalign(0)
-h = Gtk.Label(label="dowolny klawisz albo klik zamyka"); h.set_name('hint'); h.set_valign(Gtk.Align.END)
+t = Gtk.Label(label="Shortcuts and gestures"); t.set_name('title'); t.set_xalign(0)
+h = Gtk.Label(label="any key or click closes it"); h.set_name('hint'); h.set_valign(Gtk.Align.END)
 head.pack_start(t, False, False, 0); head.pack_end(h, False, False, 0); outer.add(head)
 
 cols = Gtk.Box(spacing=48)

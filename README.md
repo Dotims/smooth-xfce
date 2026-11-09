@@ -27,7 +27,7 @@ screen, all in the Tokyo Night palette.
   mixer), warmth and brightness, plus buttons for settings, lock, screen off and power. Volume keys
   show an on-screen bar.
 - **Calendar**: click the clock. Weeks start on Monday, Polish public holidays are red and the next
-  day off sits at the bottom.
+  day off sits at the bottom. EN/PL in the corner (or the L key) switches its language.
 - **Lock screen**: a live clock and a password field with dots, drawn by a small
   [xsecurelock](https://github.com/google/xsecurelock) module. PAM still checks the password, and
   any error in the module switches back to the stock prompt.
@@ -68,7 +68,7 @@ cd smooth-xfce
 ```
 
 From the AUR: `bibata-cursor-theme-bin` for the cursor and `skippy-xd-git` for `Super+Tab`.
-Log out and back in once afterwards. The popups, lock screen, power menu and cheat sheet are in Polish.
+Log out and back in once afterwards. Everything is in English; only the calendar can switch to Polish.
 
 On a desktop (no battery) the script skips the touchpad gestures and the brightness slider, quick
 settings shows an Ethernet tile when there is no Wi-Fi, and `--panel` adds a menu, dock and clock

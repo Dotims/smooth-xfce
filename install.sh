@@ -68,8 +68,8 @@ for k in $(xfconf-query -c xfce4-desktop -l | grep last-image); do
 
 echo "==> workspaces, gestures, clipboard history"
 xfconf-query -c xfwm4 -p /general/workspace_count -s 3
-xfconf-query -c xfwm4 -p /general/workspace_names -n -t string -t string -t string -s Praca -s Nauka -s Prywatne 2>/dev/null || \
-  xfconf-query -c xfwm4 -p /general/workspace_names -t string -t string -t string -s Praca -s Nauka -s Prywatne
+xfconf-query -c xfwm4 -p /general/workspace_names -n -t string -t string -t string -s Work -s Study -s Personal 2>/dev/null || \
+  xfconf-query -c xfwm4 -p /general/workspace_names -t string -t string -t string -s Work -s Study -s Personal
 [ -n "$LAPTOP" ] && sudo systemctl enable --now touchegg.service
 systemctl --user daemon-reload && systemctl --user enable --now clipmenud.service
 

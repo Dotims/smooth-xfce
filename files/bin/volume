@@ -9,12 +9,12 @@ esac
 vol=$(pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1 | tr -d %)
 [ "${vol:-0}" -gt 100 ] && pactl set-sink-volume @DEFAULT_SINK@ 100% && vol=100
 if [ "$1" = mic ]; then
-  pactl get-source-mute @DEFAULT_SOURCE@ | grep -q yes && body="Mikrofon wyciszony" || body="Mikrofon włączony"
-  icon=microphone-sensitivity-high-symbolic; title=Mikrofon; hint=()
+  pactl get-source-mute @DEFAULT_SOURCE@ | grep -q yes && body="Microphone muted" || body="Microphone on"
+  icon=microphone-sensitivity-high-symbolic; title=Microphone; hint=()
 else
-  pactl get-sink-mute @DEFAULT_SINK@ | grep -q yes && { icon=audio-volume-muted-symbolic; body="Wyciszono"; } \
+  pactl get-sink-mute @DEFAULT_SINK@ | grep -q yes && { icon=audio-volume-muted-symbolic; body="Muted"; } \
     || { icon=audio-volume-high-symbolic; body="$vol%"; }
-  title="Głośność"; hint=(-h "int:value:$vol")
+  title="Volume"; hint=(-h "int:value:$vol")
 fi
 # reuse one notification so repeated presses update the same bar
 idf="${XDG_RUNTIME_DIR:-/tmp}/volume-osd.id"

@@ -127,9 +127,9 @@ class StatusBar:
             return
         self.last = state
         self.render(*state)
-        tip = [f'Głośność {vol}%' + (' (wyciszona)' if muted else '')]
+        tip = [f'Volume {vol}%' + (' (muted)' if muted else '')]
         if state[3]:
-            tip.append(f'bateria {state[3][0]}%' + (', ładowanie' if state[3][1] == 'Charging' else ''))
+            tip.append(f'battery {state[3][0]}%' + (', charging' if state[3][1] == 'Charging' else ''))
         self.write('tooltip', ' · '.join(tip).encode())
 
     def svg(self, name):

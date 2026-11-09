@@ -1,17 +1,38 @@
 #!/usr/bin/env python3
-# Clock popup: month grid from Monday, Polish public holidays in red, the next day off.
+# Clock popup: month grid from Monday, Polish public holidays in red, the next day off, in English
+# or Polish (EN/PL in the footer, or the L key; the choice is remembered).
 # Stays running hidden; `calendar-popup` toggles it over D-Bus so it opens instantly.
 import datetime as dt
+import json
+import os
 
 from popup import Popup, label, run
 from gi.repository import Gdk, Gtk
 
-MONTHS = ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec', 'lipiec', 'sierpień',
-          'wrzesień', 'październik', 'listopad', 'grudzień']
-MONTHS_OF = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia',
-             'września', 'października', 'listopada', 'grudnia']
-WEEKDAYS = ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela']
-DAY_LABELS = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd']
+CFG = os.path.expanduser('~/.config/desktop-look/calendar.json')
+LANGS = ('en', 'pl')
+EN_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+             'October', 'November', 'December']
+TEXT = {
+    'en': {
+        'months': EN_MONTHS,
+        'months_of': EN_MONTHS,
+        'weekdays': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        'days': ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+        'week': 'week {}',
+        'when': ('today', 'tomorrow', 'in {} days'),
+    },
+    'pl': {
+        'months': ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec', 'lipiec', 'sierpień',
+                   'wrzesień', 'październik', 'listopad', 'grudzień'],
+        'months_of': ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca',
+                      'sierpnia', 'września', 'października', 'listopada', 'grudnia'],
+        'weekdays': ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela'],
+        'days': ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'],
+        'week': 'tydzień {}',
+        'when': ('dziś', 'jutro', 'za {} dni'),
+    },
+}
 
 CSS = b""".weekday { color: #7aa2f7; font-size: 10pt; font-weight: 600; }
 .week { color: #565f89; font-size: 9pt; }
@@ -23,6 +44,9 @@ CSS = b""".weekday { color: #7aa2f7; font-size: 10pt; font-weight: 600; }
 }
 .nav:hover { background-color: rgba(255, 255, 255, 0.07); color: #c0caf5; }
 .nav label { color: #7aa2f7; font-size: 9pt; font-weight: 600; }
+.lang { min-width: 24px; padding: 0 4px; }
+.lang label { color: #565f89; }
+.lang.on label { color: #7aa2f7; }
 .head { color: #565f89; font-size: 8.5pt; font-weight: 600; }
 .head.sun { color: rgba(247, 118, 142, 0.55); }
 .day { font-size: 10pt; min-width: 30px; min-height: 30px; border-radius: 15px; }
@@ -52,30 +76,49 @@ def easter(y):
 
 
 def holidays(y):
+    # {date: (English name, Polish name)}, in the order of LANGS
     e, d, w = easter(y), dt.date, dt.timedelta
     days = {
-        d(y, 1, 1): 'Nowy Rok', d(y, 1, 6): 'Trzech Króli',
-        e: 'Wielkanoc', e + w(1): 'Poniedziałek Wielkanocny',
-        d(y, 5, 1): 'Święto Pracy', d(y, 5, 3): 'Święto Konstytucji 3 Maja',
-        e + w(49): 'Zielone Świątki', e + w(60): 'Boże Ciało',
-        d(y, 8, 15): 'Wniebowzięcie NMP', d(y, 11, 1): 'Wszystkich Świętych',
-        d(y, 11, 11): 'Święto Niepodległości',
-        d(y, 12, 25): 'Boże Narodzenie', d(y, 12, 26): 'drugi dzień świąt',
+        d(y, 1, 1): ("New Year's Day", 'Nowy Rok'), d(y, 1, 6): ('Epiphany', 'Trzech Króli'),
+        e: ('Easter Sunday', 'Wielkanoc'), e + w(1): ('Easter Monday', 'Poniedziałek Wielkanocny'),
+        d(y, 5, 1): ('Labour Day', 'Święto Pracy'),
+        d(y, 5, 3): ('Constitution Day', 'Święto Konstytucji 3 Maja'),
+        e + w(49): ('Pentecost', 'Zielone Świątki'), e + w(60): ('Corpus Christi', 'Boże Ciało'),
+        d(y, 8, 15): ('Assumption Day', 'Wniebowzięcie NMP'),
+        d(y, 11, 1): ("All Saints' Day", 'Wszystkich Świętych'),
+        d(y, 11, 11): ('Independence Day', 'Święto Niepodległości'),
+        d(y, 12, 25): ('Christmas Day', 'Boże Narodzenie'),
+        d(y, 12, 26): ('Second Day of Christmas', 'drugi dzień świąt'),
     }
     if y >= 2025:
-        days[d(y, 12, 24)] = 'Wigilia'
+        days[d(y, 12, 24)] = ('Christmas Eve', 'Wigilia')
     return days
 
 
 def next_holiday(today):
     for y in (today.year, today.year + 1):
-        for day, name in sorted(holidays(y).items()):
+        for day, names in sorted(holidays(y).items()):
             if day >= today:
-                return day, name
+                return day, names
 
 
-def in_days(n):
-    return 'dziś' if n == 0 else 'jutro' if n == 1 else f'za {n} dni'
+def in_days(n, lang):
+    today, tomorrow, later = TEXT[lang]['when']
+    return today if n == 0 else tomorrow if n == 1 else later.format(n)
+
+
+def load_lang():
+    try:
+        lang = json.load(open(CFG)).get('lang')
+    except (OSError, ValueError, AttributeError):
+        lang = None
+    return lang if lang in LANGS else 'en'
+
+
+def save_lang(lang):
+    os.makedirs(os.path.dirname(CFG), exist_ok=True)
+    with open(CFG, 'w') as f:
+        json.dump({'lang': lang}, f)
 
 
 class Calendar(Popup):
@@ -86,6 +129,7 @@ class Calendar(Popup):
         super().__init__(hidden)
         self.shown = dt.date.today().replace(day=1)
         self.scroll = 0.0
+        self.lang = load_lang()
 
     def build(self, card):
         top = Gtk.Box(spacing=8)
@@ -101,7 +145,8 @@ class Calendar(Popup):
         nav.set_margin_top(14); nav.set_margin_bottom(6)
         self.month = self.label('month', xalign=0)
         nav.pack_start(self.month, True, True, 0)
-        self.today_btn = self.button(Gtk.Label(label='dziś'), lambda *_: self.go(None))
+        self.today_label = Gtk.Label()
+        self.today_btn = self.button(self.today_label, lambda *_: self.go(None))
         prev = self.button(Gtk.Image.new_from_icon_name('pan-start-symbolic', Gtk.IconSize.BUTTON),
                            lambda *_: self.go(-1))
         nxt = self.button(Gtk.Image.new_from_icon_name('pan-end-symbolic', Gtk.IconSize.BUTTON),
@@ -111,12 +156,14 @@ class Calendar(Popup):
         card.pack_start(nav, False, False, 0)
 
         grid = Gtk.Grid(column_homogeneous=True, row_spacing=2, column_spacing=6)
-        for c, name in enumerate(DAY_LABELS):
-            head = self.label('head', name)
+        self.heads = []
+        for c in range(7):
+            head = self.label('head')
             if c == 6:
                 head.get_style_context().add_class('sun')
             head.set_margin_bottom(4)
             grid.attach(head, c, 0, 1, 1)
+            self.heads.append(head)
         self.cells = []
         for r in range(6):
             for c in range(7):
@@ -136,6 +183,14 @@ class Calendar(Popup):
         self.hwhen = self.label('hwhen', xalign=0)
         text.pack_start(self.hname, False, False, 0); text.pack_start(self.hwhen, False, False, 0)
         foot.pack_start(dot, False, False, 0); foot.pack_start(text, True, True, 0)
+        switch = Gtk.Box(valign=Gtk.Align.CENTER)
+        self.lang_btns = {}
+        for code in LANGS:
+            b = self.button(Gtk.Label(label=code.upper()), lambda _b, c=code: self.set_lang(c))
+            b.get_style_context().add_class('lang')
+            switch.pack_start(b, False, False, 0)
+            self.lang_btns[code] = b
+        foot.pack_end(switch, False, False, 0)
         card.pack_start(foot, False, False, 0)
 
     def label(self, cls, text='', **props):
@@ -149,14 +204,22 @@ class Calendar(Popup):
         return b
 
     def fill(self):
+        t, i = TEXT[self.lang], LANGS.index(self.lang)
         today = dt.date.today()
-        self.weekday.set_text(WEEKDAYS[today.weekday()])
-        self.week.set_text(f'tydzień {today.isocalendar()[1]}')
-        self.date.set_text(f'{today.day} {MONTHS_OF[today.month - 1]} {today.year}')
+        self.weekday.set_text(t['weekdays'][today.weekday()])
+        self.week.set_text(t['week'].format(today.isocalendar()[1]))
+        self.date.set_text(f"{today.day} {t['months_of'][today.month - 1]} {today.year}")
         first = self.shown
-        self.month.set_text(f'{MONTHS[first.month - 1].capitalize()} {first.year}')
+        self.month.set_text(f"{t['months'][first.month - 1].capitalize()} {first.year}")
+        self.today_label.set_text(t['when'][0])
         self.today_btn.set_visible(first != today.replace(day=1))
-        red = {**holidays(first.year - 1), **holidays(first.year), **holidays(first.year + 1)}
+        for head, name in zip(self.heads, t['days']):
+            head.set_text(name)
+        for code, b in self.lang_btns.items():
+            ctx = b.get_style_context()
+            (ctx.add_class if code == self.lang else ctx.remove_class)('on')
+        red = {day: names[i] for y in (first.year - 1, first.year, first.year + 1)
+               for day, names in holidays(y).items()}
         day = first - dt.timedelta(days=first.weekday())
         for cell in self.cells:
             ctx = cell.get_style_context()
@@ -173,10 +236,16 @@ class Calendar(Popup):
             elif day.weekday() == 5:
                 ctx.add_class('sat')
             day += dt.timedelta(days=1)
-        hday, hname = next_holiday(today)
-        self.hname.set_text(hname)
-        self.hwhen.set_text(f'{WEEKDAYS[hday.weekday()]}, {hday.day} {MONTHS_OF[hday.month - 1]}'
-                            f' · {in_days((hday - today).days)}')
+        hday, hnames = next_holiday(today)
+        self.hname.set_text(hnames[i])
+        self.hwhen.set_text(f"{t['weekdays'][hday.weekday()]}, {hday.day} {t['months_of'][hday.month - 1]}"
+                            f' · {in_days((hday - today).days, self.lang)}')
+
+    def set_lang(self, lang):
+        self.lang = lang
+        save_lang(lang)
+        self.fill()
+        self.refit()  # Polish and English names differ in width
 
     def go(self, step):
         if step is None:
@@ -197,6 +266,8 @@ class Calendar(Popup):
             self.go(1)
         elif key in (Gdk.KEY_Home, Gdk.KEY_t):
             self.go(None)
+        elif key in (Gdk.KEY_l, Gdk.KEY_L):
+            self.set_lang(LANGS[1 - LANGS.index(self.lang)])
         return True
 
     def on_scroll(self, ev):
