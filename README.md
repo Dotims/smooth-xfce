@@ -19,7 +19,8 @@ screen, all in the Tokyo Night palette.
 ## What's inside
 
 - **Windows**: Qogir GTK theme recolored to the terminal navy, matching window frames, picom with
-  blur, shadows, rounded corners and open/close animations,.
+  blur, shadows, rounded corners and open/close animations. On an NVIDIA desktop the driver's
+  composition pipeline is on, so a dragged browser tab keeps up with the mouse.
 - **Panel**: glass bar with a dock (dot indicators, no boxes), the Spotify track, an Arch menu
   button and one status button for Wi-Fi, Bluetooth, volume and battery.
 - **Quick settings**: click the status button. Tiles for Wi-Fi, Bluetooth, do not disturb and

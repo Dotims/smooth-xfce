@@ -77,6 +77,15 @@ echo "==> login screen + lock background"
 sudo install -D -m 644 "$F/system/login-bg.png" /usr/share/backgrounds/radek/login-bg.png
 sudo cp "$F/system/lightdm-gtk-greeter.conf" /etc/lightdm/lightdm-gtk-greeter.conf
 "$HOME/.local/bin/lock-bg-make" >/dev/null
+if [ -z "$LAPTOP" ] && [ -e /proc/driver/nvidia/version ]; then
+  echo "==> NVIDIA composition pipeline"
+  sudo install -D -m 644 "$F/system/30-nvidia.conf" /etc/X11/xorg.conf.d/30-nvidia.conf
+  sudo rm -f /etc/X11/xorg.conf.d/30-nvidia-hotplug.conf
+  # the X config applies from the next login, the metamode switches it on right away
+  M=$(nvidia-settings -q CurrentMetaMode -t 2>/dev/null | sed 's/^.*:: //')
+  case "$M" in *ForceCompositionPipeline=On*|'') ;; *)
+    nvidia-settings --assign CurrentMetaMode="${M//\}/, ForceCompositionPipeline=On\}}" >/dev/null 2>&1;; esac
+fi
 xfconf-query -c xfce4-keyboard-shortcuts -p '/xfwm4/custom/<Super>Tab' -r 2>/dev/null
 command -v skippy-xd >/dev/null || echo "!! install skippy-xd-git from AUR for the Super+Tab overview"
 
