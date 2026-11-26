@@ -18,7 +18,8 @@ screen, all in the Tokyo Night palette.
 
 ## What's inside
 
-- **Windows**: Qogir GTK theme recolored to the terminal navy, matching window frames, picom with
+- **Windows**: Qogir GTK theme recolored to the terminal navy, WhiteSur icons (one rounded-square
+  style in the dock, colored folders even in list view), matching window frames, picom with
   blur, shadows, rounded corners and open/close animations. On an NVIDIA desktop the driver's
   composition pipeline is on, so a dragged browser tab keeps up with the mouse.
 - **Panel**: glass bar with a dock (dot indicators, no boxes), the Spotify track, an Arch menu
@@ -91,7 +92,8 @@ After changing something on the desktop, `./snapshot.sh` copies the current look
 [Tokyo Night](https://github.com/tokyo-night/tokyo-night-vscode-theme) palette (MIT),
 [Qogir](https://github.com/vinceliuice/Qogir-theme) theme (GPL-3.0, the recolored copy in
 `files/themes` keeps that license), [tokyo-night-grub](https://github.com/mino29/tokyo-night-grub)
-(MIT), wallpapers from [dharmx/walls](https://github.com/dharmx/walls).
+(MIT), [WhiteSur](https://github.com/vinceliuice/WhiteSur-icon-theme) icons (GPL-3.0),
+wallpapers from [dharmx/walls](https://github.com/dharmx/walls).
 
 AirPods in the tray come from my other project, [PodPilot](https://github.com/Dotims/podpilot).
 

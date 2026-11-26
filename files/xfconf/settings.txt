@@ -4,11 +4,11 @@ xfwm4|/general/cycle_hidden|true
 xfwm4|/general/title_font|Inter Medium 10
 xfwm4|/general/button_layout|O|SHMC
 xsettings|/Net/ThemeName|Qogir-Dark-Night
-xsettings|/Net/IconThemeName|Qogir-Dark
+xsettings|/Net/IconThemeName|WhiteSur-dark
 xsettings|/Gtk/CursorThemeName|Bibata-Modern-Ice
 xsettings|/Gtk/CursorThemeSize|24
 xsettings|/Gtk/FontName|Inter Medium 10
-xsettings|/Gtk/MonospaceFontName|Inter 10
+xsettings|/Gtk/MonospaceFontName|JetBrainsMono Nerd Font 10
 xsettings|/Xft/HintStyle|hintslight
 xsettings|/Xft/RGBA|rgb
 xfce4-terminal|/color-background|#1a1b26
@@ -58,6 +58,7 @@ xfce4-panel|/plugins/plugin-8/digital-time-font|Inter SemiBold 10
 xfce4-panel|/plugins/plugin-8/digital-time-format|%H:%M
 xfce4-panel|/plugins/plugin-8/mode|2
 xfce4-panel|/plugins/plugin-8/timezone|Europe/Warsaw
+thunar|/last-details-view-zoom-level|THUNAR_ZOOM_LEVEL_25_PERCENT
 xfce4-notifyd|/theme|Night-Glass
 xfce4-keyboard-shortcuts|/commands/custom/<Super>space|rofi -show drun
 xfce4-keyboard-shortcuts|/commands/custom/<Alt><Super>s|orca

@@ -54,6 +54,7 @@ dump() { xfconf-query -c "$1" -p "$2" 2>/dev/null; }
   for p in $(xfconf-query -c xfce4-terminal -l); do echo "xfce4-terminal|$p|$(dump xfce4-terminal $p)"; done
   echo "xfce4-panel|/plugins/plugin-1/button-icon|$(dump xfce4-panel /plugins/plugin-1/button-icon)"
   for p in $(xfconf-query -c xfce4-panel -l | grep '^/plugins/plugin-8/'); do echo "xfce4-panel|$p|$(dump xfce4-panel $p)"; done
+  echo "thunar|/last-details-view-zoom-level|$(dump thunar /last-details-view-zoom-level)"
   echo "xfce4-notifyd|/theme|$(dump xfce4-notifyd /theme)"
   echo "xfce4-keyboard-shortcuts|/commands/custom/<Super>space|$(dump xfce4-keyboard-shortcuts '/commands/custom/<Super>space')"
   # every custom shortcut (commands + window manager), so new ones travel too

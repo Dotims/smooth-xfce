@@ -55,8 +55,14 @@ mkdir -p "$HOME/.local/share/icons" && cp -a "$F/icons/." "$HOME/.local/share/ic
 mkdir -p "$HOME/.local/libexec" && cp -a "$F/libexec/." "$HOME/.local/libexec/"
 if [ ! -d "$HOME/.icons/Qogir-Dark" ] && [ ! -d /usr/share/icons/Qogir-Dark ]; then
   echo "==> Qogir icons (github)"
-  T=$(mktemp -d) && git clone -q --depth 1 https://github.com/vinceliuice/Qogir-icon-theme "$T/q" && \
-    (cd "$T/q" && ./install.sh -d "$HOME/.icons" >/dev/null) ; rm -rf "$T"
+  Q=$(mktemp -d) && git clone -q --depth 1 https://github.com/vinceliuice/Qogir-icon-theme "$Q/q" && \
+    (cd "$Q/q" && ./install.sh -d "$HOME/.icons" >/dev/null) ; rm -rf "$Q"
+fi
+# the icon theme in use; Qogir stays for the status bar's symbolic icons
+if [ ! -d "$HOME/.local/share/icons/WhiteSur-dark" ] && [ ! -d /usr/share/icons/WhiteSur-dark ]; then
+  echo "==> WhiteSur icons (github)"
+  Q=$(mktemp -d) && git clone -q --depth 1 https://github.com/vinceliuice/WhiteSur-icon-theme "$Q/w" && \
+    (cd "$Q/w" && ./install.sh -d "$HOME/.local/share/icons" >/dev/null) ; rm -rf "$Q"
 fi
 fc-cache -f >/dev/null
 grep -q 'starship init bash' "$HOME/.bashrc" 2>/dev/null || echo 'eval "$(starship init bash)"' >> "$HOME/.bashrc"
