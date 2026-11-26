@@ -5,7 +5,9 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 F="$HERE/files"
 rm -rf "$F" && mkdir -p "$F"/{config,themes,bin,xfconf,wallpapers,system,icons,libexec}
 
-cp_rel() { mkdir -p "$F/config/$(dirname "$1")"; cp -a "$HOME/.config/$1" "$F/config/$1"; }
+# a file this machine lacks (laptop-only on the PC) keeps the copy from the last commit
+keep() { git -C "$HERE" checkout -q HEAD -- "files/$1"; }
+cp_rel() { mkdir -p "$F/config/$(dirname "$1")"; if [ -e "$HOME/.config/$1" ]; then cp -a "$HOME/.config/$1" "$F/config/$1"; else keep "config/$1"; fi; }
 cp_rel gtk-3.0/gtk.css
 cp_rel picom/picom.conf
 cp_rel autostart/picom.desktop
@@ -35,7 +37,7 @@ cp -a "$HOME/.icons/default/index.theme" "$F/themes/cursor-index.theme"
 for b in lock-now lock-saver lock-bg-make handy-mono-tray ws grid-windows clipboard-menu rofi-power now-playing cheatsheet calendar-popup quick-settings status-icons volume after-tray skippy ghostty-here; do cp -a "$HOME/.local/bin/$b" "$F/bin/"; done
 cp -a "$HOME"/Pictures/Wallpapers/* "$F/wallpapers/"
 mkdir -p "$F/share" && cp -a "$HOME"/.local/share/desktop-look/*.py "$HOME"/.local/share/desktop-look/blank.png "$F/share/"
-cp -a "$HOME/.local/src/pinch-zoom/pinch-zoom.c" "$F/share/"
+if [ -e "$HOME/.local/src/pinch-zoom/pinch-zoom.c" ]; then cp -a "$HOME/.local/src/pinch-zoom/pinch-zoom.c" "$F/share/"; else keep share/pinch-zoom.c; fi
 cp -a "$HOME/.local/share/xfce4/helpers/ghostty.desktop" "$F/share/ghostty-helper.desktop"
 cp -a "$HOME/.local/share/icons/arch-menu.svg" "$F/icons/"
 cp -a "$HOME/.local/libexec/xsecurelock" "$F/libexec/"
