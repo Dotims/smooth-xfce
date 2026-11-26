@@ -28,7 +28,9 @@ screen, all in the Tokyo Night palette.
   mixer), warmth and brightness, plus buttons for settings, lock, screen off and power. Volume keys
   show an on-screen bar.
 - **Calendar**: click the clock. Weeks start on Monday, Polish public holidays are red and the next
-  day off sits at the bottom. EN/PL in the corner (or the L key) switches its language.
+  day off sits at the bottom. EN/PL in the corner (or the L key) switches its language. With Google
+  calendars connected, days with events get a dot, the agenda lists today (or the day you click)
+  and what is coming up, and clicking an event opens that day in Google Calendar.
 - **Lock screen**: a live clock and a password field with dots on every monitor, drawn by a small
   [xsecurelock](https://github.com/google/xsecurelock) module. PAM still checks the password, and
   any error in the module switches back to the stock prompt.
@@ -76,6 +78,11 @@ Log out and back in once afterwards. Everything is in English; only the calendar
 On a desktop (no battery) the script skips the touchpad gestures and the brightness slider, quick
 settings shows an Ethernet tile when there is no Wi-Fi, and `--panel` adds a menu, dock and clock
 on every extra monitor.
+
+Google Calendar: in its settings open a calendar, copy *Secret address in iCal format* and put it in
+`~/.config/desktop-look/google-calendars.json` as `[{"url": "...", "account": "you@gmail.com"}]`,
+one entry per calendar (`chmod 600`, the address gives read access). Add `"routine": true` to a
+timetable: its events still show in the day's agenda but get no dots.
 
 After changing something on the desktop, `./snapshot.sh` copies the current look back into `files/`.
 

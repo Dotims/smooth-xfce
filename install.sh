@@ -19,7 +19,8 @@ echo "==> packages"
 sudo pacman -S --needed --noconfirm picom rofi starship ghostty xsecurelock inter-font \
   ttf-jetbrains-mono-nerd papirus-icon-theme xfce4-docklike-plugin python-pillow xdotool \
   rofi-emoji rofi-calc playerctl wmctrl clipmenu xfce4-genmon-plugin xclip python-gobject python-cairo \
-  fastfetch btop redshift network-manager-applet ${LAPTOP:+touchegg brightnessctl}
+  fastfetch btop redshift network-manager-applet python-icalendar python-recurring-ical-events \
+  ${LAPTOP:+touchegg brightnessctl}
 pacman -Q bibata-cursor-theme-bin >/dev/null 2>&1 || pacman -Q bibata-cursor-theme >/dev/null 2>&1 || \
   echo "!! install bibata-cursor-theme-bin from AUR for the cursor"
 
