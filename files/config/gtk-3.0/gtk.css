@@ -540,3 +540,20 @@ window.xfce4-panel {
 }
 /* plugins run in their own wrapper windows, which stay clear unless styled like the bar */
 #XfcePanelWindowWrapper { background-color: rgba(26, 27, 38, 0.82); background-image: none; }
+
+/* motion (2026-11-26): dock icons grow and lift under the pointer and dip when clicked; GTK3 animates
+   the icon transform, the slight overshoot in the curve gives it a soft bounce */
+#docklike-plugin button image {
+  transition: -gtk-icon-transform 180ms cubic-bezier(0.2, 0.9, 0.3, 1.25);
+}
+#docklike-plugin button:hover image { -gtk-icon-transform: scale(1.14) translateY(-2px); }
+#docklike-plugin button:active image {
+  -gtk-icon-transform: scale(0.9);
+  transition: -gtk-icon-transform 70ms ease-out;
+}
+#whiskermenu-button image { transition: -gtk-icon-transform 180ms cubic-bezier(0.2, 0.9, 0.3, 1.25); }
+#whiskermenu-button:hover image { -gtk-icon-transform: scale(1); }
+#whiskermenu-button:active image { -gtk-icon-transform: scale(0.8); transition: -gtk-icon-transform 70ms ease-out; }
+/* hover fills fade in and out instead of snapping (dock tiles, clock, status and music buttons) */
+#XfcePanelWindow button,
+#docklike-plugin button { transition: background-color 160ms ease-out; }
