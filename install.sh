@@ -68,7 +68,7 @@ while IFS='|' read -r ch p v; do
   xfconf-query -c "$ch" -p "$p" -n -t "$t" -s "$v"
 done < "$F/xfconf/settings.txt"
 for k in $(xfconf-query -c xfce4-desktop -l | grep last-image); do
-  xfconf-query -c xfce4-desktop -p "$k" -s "$HOME/Pictures/Wallpapers/black-sand-beach.jpg"; done
+  xfconf-query -c xfce4-desktop -p "$k" -s "$HOME/Pictures/Wallpapers/snowy-forest-night.jpg"; done
 
 echo "==> workspaces, gestures, clipboard history"
 xfconf-query -c xfwm4 -p /general/workspace_count -s 3
