@@ -33,8 +33,9 @@ screen, all in the Tokyo Night palette.
   [xsecurelock](https://github.com/google/xsecurelock) module. PAM still checks the password, and
   any error in the module switches back to the stock prompt.
 - **Launcher**: rofi in a Spotlight style with tabs for apps, windows, files, a calculator and emoji.
-- **Terminal**: xfce4-terminal in Tokyo Night with JetBrains Mono, a Starship prompt, fastfetch and
-  btop in the same colors.
+- **Terminal**: Ghostty in Tokyo Night with JetBrains Mono. Tabs sit in the title bar with a + button
+  and open in the current folder. A Starship prompt, fastfetch and btop use the same colors, and the
+  drop-down terminal stays xfce4-terminal.
 - **Login and boot**: LightDM greeter, GRUB theme and Plymouth splash.
 
 ## Shortcuts
@@ -48,6 +49,7 @@ screen, all in the Tokyo Night palette.
 | `Super+G` | Arrange every window in a grid |
 | `Super+V` | Clipboard history |
 | `Super+;` / `Super+C` | Emoji / calculator |
+| `Super+T` / `Ctrl+Shift+T` | Terminal / new tab in it |
 | `` Super+` `` | Drop-down terminal |
 | `Super+L` / `Super+Esc` | Lock / power menu |
 | `Super+/` | Cheat sheet with everything above |

@@ -1,0 +1,3 @@
+#!/bin/sh
+# exo starts the terminal inside the folder to open; Ghostty only honors that as a flag
+exec ghostty --working-directory="$PWD" "$@"

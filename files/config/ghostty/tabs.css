@@ -1,0 +1,4 @@
+/* title bar tabs in the terminal palette: dim inactive tabs, navy pill for the active one */
+tabbar tab { color: #565f89; }
+tabbar tab:hover { color: #a9b1d6; }
+tabbar tab:selected { color: #c0caf5; background-color: #292e42; }

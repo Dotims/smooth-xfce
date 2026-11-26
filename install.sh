@@ -16,7 +16,7 @@ grep -rIl '@HOME@' "$F" | xargs -r sed -i "s|@HOME@|$HOME|g"
 LAPTOP=; ls /sys/class/power_supply/BAT* >/dev/null 2>&1 && LAPTOP=1
 
 echo "==> packages"
-sudo pacman -S --needed --noconfirm picom rofi starship xsecurelock inter-font \
+sudo pacman -S --needed --noconfirm picom rofi starship ghostty xsecurelock inter-font \
   ttf-jetbrains-mono-nerd papirus-icon-theme xfce4-docklike-plugin python-pillow xdotool \
   rofi-emoji rofi-calc playerctl wmctrl clipmenu xfce4-genmon-plugin xclip python-gobject python-cairo \
   fastfetch btop redshift network-manager-applet ${LAPTOP:+touchegg brightnessctl}
@@ -36,6 +36,10 @@ mkdir -p "$HOME/.themes" "$HOME/.icons/default" "$HOME/.local/bin" "$HOME/Pictur
 tar -C "$HOME/.themes" -xzf "$F/themes/themes.tar.gz"
 cp -a "$F/themes/cursor-index.theme" "$HOME/.icons/default/index.theme"
 cp -a "$F/bin/." "$HOME/.local/bin/"
+# Ghostty is the default terminal, the exo helper opens it in the folder Thunar asks for
+mkdir -p "$HOME/.local/share/xfce4/helpers" && cp -a "$F/share/ghostty-helper.desktop" "$HOME/.local/share/xfce4/helpers/ghostty.desktop"
+H="$HOME/.config/xfce4/helpers.rc"; touch "$H"
+grep -q '^TerminalEmulator=' "$H" && sed -i 's/^TerminalEmulator=.*/TerminalEmulator=ghostty/' "$H" || echo 'TerminalEmulator=ghostty' >> "$H"
 cp -a "$F/wallpapers/." "$HOME/Pictures/Wallpapers/"
 mkdir -p "$HOME/.local/share/desktop-look" && cp -a "$F/share/." "$HOME/.local/share/desktop-look/"
 if [ -n "$LAPTOP" ]; then

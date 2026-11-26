@@ -101,7 +101,7 @@ xfce4-keyboard-shortcuts|/commands/custom/<Super>r/startup-notify|true
 xfce4-keyboard-shortcuts|/commands/custom/<Super>semicolon|rofi -show emoji -modi emoji
 xfce4-keyboard-shortcuts|/commands/custom/<Super>slash|@HOME@/.local/bin/cheatsheet
 xfce4-keyboard-shortcuts|/commands/custom/<Super>space|rofi -show drun
-xfce4-keyboard-shortcuts|/commands/custom/<Super>t|xfce4-terminal
+xfce4-keyboard-shortcuts|/commands/custom/<Super>t|ghostty
 xfce4-keyboard-shortcuts|/commands/custom/<Super>v|@HOME@/.local/bin/clipboard-menu
 xfce4-keyboard-shortcuts|/commands/custom/F11|flameshot gui --region all
 xfce4-keyboard-shortcuts|/commands/custom/HomePage|exo-open --launch WebBrowser

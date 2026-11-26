@@ -1,0 +1,49 @@
+# Ghostty: Tokyo Night, tabs in the title bar with a + button, same feel as the old xfce4-terminal
+font-family = JetBrainsMono Nerd Font
+font-size = 12
+window-title-font-family = Inter
+
+background = #1a1b26
+foreground = #c0caf5
+cursor-color = #e0af68
+cursor-text = #1a1b26
+selection-background = #2e3c64
+selection-foreground = #c0caf5
+palette = 0=#15161e
+palette = 1=#f7768e
+palette = 2=#9ece6a
+palette = 3=#e0af68
+palette = 4=#7aa2f7
+palette = 5=#bb9af7
+palette = 6=#7dcfff
+palette = 7=#a9b1d6
+palette = 8=#414868
+palette = 9=#ff899d
+palette = 10=#9fe044
+palette = 11=#faba4a
+palette = 12=#8db0ff
+palette = 13=#c7a9ff
+palette = 14=#a4daff
+palette = 15=#c0caf5
+
+window-theme = ghostty
+window-titlebar-background = #16161e
+window-titlebar-foreground = #a9b1d6
+gtk-titlebar-style = tabs
+gtk-toolbar-style = flat
+gtk-wide-tabs = false
+gtk-custom-css = tabs.css
+window-width = 100
+window-height = 28
+window-padding-x = 14
+window-padding-y = 10
+window-padding-balance = true
+
+cursor-style = block
+shell-integration-features = no-cursor,ssh-env
+mouse-hide-while-typing = true
+copy-on-select = clipboard
+clipboard-paste-protection = false
+confirm-close-surface = false
+# new windows (Super+T) start at home, new tabs and splits keep the current folder
+window-inherit-working-directory = false

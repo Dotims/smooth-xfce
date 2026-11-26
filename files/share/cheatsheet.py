@@ -25,6 +25,7 @@ SECTIONS = [
     ("Super+C", "calculator, Enter copies the result"),
     ("Super+`", "drop-down terminal"),
     ("Super+T  /  Super+E", "terminal / files"),
+    ("Ctrl+Shift+T", "new tab in the terminal"),
     ("Super", "app menu"),
   ]),
   ("System", [

@@ -25,19 +25,23 @@ cp_rel autostart/nm-applet.desktop
 cp_rel autostart/blueman.desktop
 cp_rel fastfetch/config.jsonc
 cp_rel btop/btop.conf
+cp_rel ghostty/config
+cp_rel ghostty/tabs.css
 cp_rel flameshot/flameshot.ini
 
 tar -C "$HOME/.themes" -czf "$F/themes/themes.tar.gz" Qogir-Dark Qogir-Dark-Night Night-Glass
 cp -a "$HOME/.icons/default/index.theme" "$F/themes/cursor-index.theme"
 
-for b in lock-now lock-saver lock-bg-make handy-mono-tray ws grid-windows clipboard-menu rofi-power now-playing cheatsheet calendar-popup quick-settings status-icons volume after-tray skippy; do cp -a "$HOME/.local/bin/$b" "$F/bin/"; done
+for b in lock-now lock-saver lock-bg-make handy-mono-tray ws grid-windows clipboard-menu rofi-power now-playing cheatsheet calendar-popup quick-settings status-icons volume after-tray skippy ghostty-here; do cp -a "$HOME/.local/bin/$b" "$F/bin/"; done
 cp -a "$HOME"/Pictures/Wallpapers/* "$F/wallpapers/"
 mkdir -p "$F/share" && cp -a "$HOME"/.local/share/desktop-look/*.py "$HOME"/.local/share/desktop-look/blank.png "$F/share/"
 cp -a "$HOME/.local/src/pinch-zoom/pinch-zoom.c" "$F/share/"
+cp -a "$HOME/.local/share/xfce4/helpers/ghostty.desktop" "$F/share/ghostty-helper.desktop"
 cp -a "$HOME/.local/share/icons/arch-menu.svg" "$F/icons/"
 cp -a "$HOME/.local/libexec/xsecurelock" "$F/libexec/"
 cp -a /etc/lightdm/lightdm-gtk-greeter.conf "$F/system/"
 cp -a /usr/share/backgrounds/radek/login-bg.png "$F/system/"
+[ -f /etc/X11/xorg.conf.d/30-nvidia.conf ] && cp -a /etc/X11/xorg.conf.d/30-nvidia.conf "$F/system/"
 tar -C /boot/grub/themes -czf "$F/system/grub-theme.tar.gz" tokyo-night-radek
 
 # xfconf values that make up the look (property list keeps it reviewable in git)

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Icon=com.mitchellh.ghostty
+Type=X-XFCE-Helper
+Name=Ghostty
+StartupNotify=true
+X-XFCE-Binaries=ghostty-here;
+X-XFCE-Category=TerminalEmulator
+X-XFCE-Commands=%B;
+X-XFCE-CommandsWithParameter=%B -e %s;
