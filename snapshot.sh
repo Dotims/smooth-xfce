@@ -34,7 +34,7 @@ cp_rel flameshot/flameshot.ini
 tar -C "$HOME/.themes" -czf "$F/themes/themes.tar.gz" Qogir-Dark Qogir-Dark-Night Night-Glass
 cp -a "$HOME/.icons/default/index.theme" "$F/themes/cursor-index.theme"
 
-for b in lock-now lock-saver lock-bg-make handy-mono-tray ws grid-windows clipboard-menu rofi-power now-playing cheatsheet calendar-popup quick-settings status-icons volume after-tray skippy ghostty-here; do cp -a "$HOME/.local/bin/$b" "$F/bin/"; done
+for b in lock-now lock-saver lock-bg-make handy-mono-tray ws grid-windows clipboard-menu rofi-power now-playing cheatsheet calendar-popup quick-settings status-icons volume after-tray skippy ghostty-here panel-spacer; do cp -a "$HOME/.local/bin/$b" "$F/bin/"; done
 cp -a "$HOME"/Pictures/Wallpapers/* "$F/wallpapers/"
 mkdir -p "$F/share" && cp -a "$HOME"/.local/share/desktop-look/*.py "$HOME"/.local/share/desktop-look/blank.png "$F/share/"
 if [ -e "$HOME/.local/src/pinch-zoom/pinch-zoom.c" ]; then cp -a "$HOME/.local/src/pinch-zoom/pinch-zoom.c" "$F/share/"; else keep share/pinch-zoom.c; fi
@@ -49,7 +49,7 @@ tar -C /boot/grub/themes -czf "$F/system/grub-theme.tar.gz" tokyo-night-radek
 # xfconf values that make up the look (property list keeps it reviewable in git)
 dump() { xfconf-query -c "$1" -p "$2" 2>/dev/null; }
 {
-  for p in /general/theme /general/use_compositing /general/cycle_hidden /general/title_font /general/button_layout; do
+  for p in /general/theme /general/use_compositing /general/cycle_hidden /general/title_font /general/margin_bottom /general/button_layout; do
     echo "xfwm4|$p|$(dump xfwm4 $p)"; done
   for p in /Net/ThemeName /Net/IconThemeName /Gtk/CursorThemeName /Gtk/CursorThemeSize /Gtk/FontName /Gtk/MonospaceFontName /Xft/HintStyle /Xft/RGBA; do
     echo "xsettings|$p|$(dump xsettings $p)"; done

@@ -1,5 +1,6 @@
 # Shared base of the panel popups (calendar, quick settings): a glass card above the panel that
 # stays running hidden, toggles over D-Bus and closes on Esc or a click outside.
+import subprocess
 import sys
 
 import gi
@@ -152,7 +153,20 @@ def work_area(display, monitor):
     if primary is not None and monitor != primary and area.equal(monitor.get_geometry()):
         geo, work = primary.get_geometry(), primary.get_workarea()
         area.height -= geo.y + geo.height - work.y - work.height
+    # a floating panel reserves no strut; xfwm4's bottom margin is what keeps windows above it
+    geo = monitor.get_geometry()
+    if area.y + area.height == geo.y + geo.height:
+        area.height -= bottom_margin()
     return area
+
+
+def bottom_margin():
+    try:
+        out = subprocess.run(['xfconf-query', '-c', 'xfwm4', '-p', '/general/margin_bottom'],
+                             capture_output=True, text=True, timeout=2).stdout
+        return int(out.strip() or 0)
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return 0
 
 
 def label(cls, text='', **props):

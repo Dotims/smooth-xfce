@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 # Pins the main panel to the primary monitor and adds a smaller copy (menu, dock, clock) on every
-# other monitor. Usage: panel_monitors.py <xfce4-panel.xml> <panel plugin rc dir>
+# other monitor. Every panel floats GAP px above the bottom edge; xfwm4's margin_bottom keeps
+# maximized windows above it. Usage: panel_monitors.py <xfce4-panel.xml> <panel plugin rc dir>
+import os
 import re
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
 
-# plugins of the main panel repeated on the other monitors
-COPY = ['1', '15', '2', '3', '8', '20']
+# plugins of the main panel repeated on the other monitors: expander, menu, dock, expander, clock
+COPY = ['3', '1', '15', '2', '31', '8', '20']
+GAP = 10
 
 
 def monitors():
@@ -27,6 +30,12 @@ def prop(parent, name, typ, value=None):
     return p
 
 
+def floating(panel, size, w, h, x, y):
+    for p in panel.findall("property[@name='position']"):
+        panel.remove(p)
+    prop(panel, 'position', 'string', f'p=0;x={x + w // 2};y={y + h - GAP - size // 2}')
+
+
 def main(path, rcdir):
     mons = monitors()
     tree = ET.parse(path)
@@ -34,7 +43,9 @@ def main(path, rcdir):
     panels = root.find("property[@name='panels']")
     plugins = root.find("property[@name='plugins']")
     main_panel = panels.find("property[@name='panel-1']")
+    size = int(main_panel.find("property[@name='size']").get('value'))
     prop(main_panel, 'output-name', 'string', mons[0][1])
+    floating(main_panel, size, *mons[0][2:])
     if len(mons) < 2:
         tree.write(path, encoding='UTF-8', xml_declaration=True)
         return
@@ -52,8 +63,16 @@ def main(path, rcdir):
             if p.get('name') in ('plugin-ids', 'output-name', 'position'):
                 panel.remove(p)
         prop(panel, 'output-name', 'string', name)
-        prop(panel, 'position', 'string', f'p=8;x={x + w // 2};y={y + h - 20}')
+        floating(panel, size, w, h, x, y)
         ids = prop(panel, 'plugin-ids', 'array')
+        # an empty slot as wide as the clock keeps the dock in the middle
+        ET.SubElement(ids, 'value', type='int', value=str(next_id))
+        spacer = prop(plugins, f'plugin-{next_id}', 'string', 'genmon')
+        prop(spacer, 'command', 'string', os.path.expanduser('~/.local/bin/panel-spacer') + ' 80')
+        prop(spacer, 'update-period', 'int', 3600000)
+        prop(spacer, 'use-label', 'bool', 'false')
+        prop(spacer, 'enable-single-row', 'bool', 'true')
+        next_id += 1
         for old in COPY:
             ET.SubElement(ids, 'value', type='int', value=str(next_id))
             plugin = ET.fromstring(ET.tostring(by_id[old]))

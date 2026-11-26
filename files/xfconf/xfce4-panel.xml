@@ -6,9 +6,9 @@
     <value type="int" value="1"/>
     <property name="dark-mode" type="bool" value="true"/>
     <property name="panel-1" type="empty">
-      <property name="position" type="string" value="p=8;x=960;y=1060"/>
-      <property name="size" type="uint" value="50"/>
-      <property name="length" type="uint" value="100"/>
+      <property name="position" type="string" value="p=0;x=960;y=1044"/>
+      <property name="size" type="uint" value="52"/>
+      <property name="length" type="uint" value="99"/>
       <property name="position-locked" type="bool" value="true"/>
       <property name="nrows" type="uint" value="1"/>
       <property name="icon-size" type="uint" value="0"/>
@@ -17,11 +17,12 @@
       <property name="autohide-behavior" type="uint" value="0"/>
       <property name="span-monitors" type="bool" value="false"/>
       <property name="plugin-ids" type="array">
+        <value type="int" value="23"/>
+        <value type="int" value="3"/>
         <value type="int" value="1"/>
         <value type="int" value="15"/>
         <value type="int" value="2"/>
-        <value type="int" value="3"/>
-        <value type="int" value="23"/>
+        <value type="int" value="31"/>
         <value type="int" value="6"/>
         <value type="int" value="24"/>
         <value type="int" value="7"/>
@@ -31,6 +32,10 @@
     </property>
   </property>
   <property name="plugins" type="empty">
+    <property name="plugin-31" type="string" value="separator">
+      <property name="expand" type="bool" value="true"/>
+      <property name="style" type="uint" value="0"/>
+    </property>
     <property name="plugin-3" type="string" value="separator">
       <property name="expand" type="bool" value="true"/>
       <property name="style" type="uint" value="0"/>

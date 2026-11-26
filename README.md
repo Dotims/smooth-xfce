@@ -22,8 +22,9 @@ screen, all in the Tokyo Night palette.
   style in the dock, colored folders even in list view), matching window frames, picom with
   blur, shadows, rounded corners and open/close animations. On an NVIDIA desktop the driver's
   composition pipeline is on, so a dragged browser tab keeps up with the mouse.
-- **Panel**: glass bar with a dock (dot indicators, no boxes), the Spotify track, an Arch menu
-  button and one status button for Wi-Fi, Bluetooth, volume and battery.
+- **Panel**: a rounded glass bar floating above the screen edge. The dock sits in the middle with
+  the Arch menu button and dot indicators, the Spotify track on the left, the tray, one status
+  button for Wi-Fi, Bluetooth, volume and battery and the clock on the right.
 - **Quick settings**: click the status button. Tiles for Wi-Fi, Bluetooth, do not disturb and
   night light, network and device lists, sliders for volume (with the output picker and a per-app
   mixer), warmth and brightness, plus buttons for settings, lock, screen off and power. Volume keys

@@ -532,11 +532,11 @@ window.thunar menubar { background-color: #1a1b26; background-image: none; box-s
 #XfcePanelWindow eventbox,
 #XfcePanelWindow .genmon_valuebutton,
 #XfcePanelWindow .genmon_imagebutton { background-color: transparent; background-image: none; }
-/* full-width bar: square ends where it meets the screen edges, only a top hairline */
+/* floating bar: picom rounds the corners and casts the shadow, so no border of its own */
 #XfcePanelWindow,
 window.xfce4-panel {
   border-radius: 0;
-  border-width: 1px 0 0 0;
+  border-width: 0;
 }
 /* plugins run in their own wrapper windows, which stay clear unless styled like the bar */
 #XfcePanelWindowWrapper { background-color: rgba(26, 27, 38, 0.82); background-image: none; }

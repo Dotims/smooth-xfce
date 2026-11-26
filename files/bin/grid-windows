@@ -8,6 +8,8 @@ def prop(w, name):
 desk = int(sh('xdotool', 'get_desktop'))
 area = [int(v) for v in sh('xprop', '-root', '_NET_WORKAREA').split('=')[1].replace(',', ' ').split()[:4]]
 ax, ay, aw, ah = area
+# the floating panel reserves no strut, xfwm4's bottom margin keeps windows above it
+ah -= int(sh('xfconf-query', '-c', 'xfwm4', '-p', '/general/margin_bottom').strip() or 0)
 wins = []
 for line in sh('wmctrl', '-l').splitlines():
     w, d = line.split()[0], int(line.split()[1])

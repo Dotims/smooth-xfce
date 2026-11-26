@@ -2,6 +2,7 @@ xfwm4|/general/theme|Qogir-Dark-Night
 xfwm4|/general/use_compositing|false
 xfwm4|/general/cycle_hidden|true
 xfwm4|/general/title_font|Inter Medium 10
+xfwm4|/general/margin_bottom|72
 xfwm4|/general/button_layout|O|SHMC
 xsettings|/Net/ThemeName|Qogir-Dark-Night
 xsettings|/Net/IconThemeName|WhiteSur-dark
