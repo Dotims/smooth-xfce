@@ -64,6 +64,8 @@ if [ ! -d "$HOME/.local/share/icons/WhiteSur-dark" ] && [ ! -d /usr/share/icons/
   Q=$(mktemp -d) && git clone -q --depth 1 https://github.com/vinceliuice/WhiteSur-icon-theme "$Q/w" && \
     (cd "$Q/w" && ./install.sh -d "$HOME/.local/share/icons" >/dev/null) ; rm -rf "$Q"
 fi
+# WhiteSur-Night = WhiteSur-dark with its colored folders also at 16-24 px (Thunar's list view)
+"$HOME/.local/bin/make-icon-overlay" "$HOME/.local/share/icons" >/dev/null || echo "!! icon overlay failed"
 fc-cache -f >/dev/null
 grep -q 'starship init bash' "$HOME/.bashrc" 2>/dev/null || echo 'eval "$(starship init bash)"' >> "$HOME/.bashrc"
 

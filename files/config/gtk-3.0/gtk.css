@@ -375,18 +375,22 @@ window.xfce4-panel {
 #xfwm-tabwin {
   -XfwmTabwinWidget-preview-size: 200;
   -XfwmTabwinWidget-border-radius: 22;
-  padding: 18px;
+  padding: 20px 24px 12px;
   border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background-color: rgba(22, 23, 28, 0.84);
+  background-color: rgba(26, 27, 38, 0.86);
 }
+/* icons only (xfwm4's compositor is off, so its "previews" were drawings of an empty window) */
 #xfwm-tabwin button {
-  padding: 10px;
+  padding: 14px;
+  margin: 0 3px;
   border: none;
-  border-radius: 14px;
+  border-radius: 18px;
   background: transparent;
   box-shadow: none;
 }
+/* the app name under each icon is cut to "Xfce4…" at this width; the window title shows below */
+#xfwm-tabwin button label { font-size: 1px; color: transparent; }
 #xfwm-tabwin button:hover {
   background: rgba(255, 255, 255, 0.07);
 }

@@ -33,9 +33,9 @@ screen, all in the Tokyo Night palette.
   day off sits at the bottom. EN/PL in the corner (or the L key) switches its language. With Google
   calendars connected, days with events get a dot, the agenda lists today (or the day you click)
   and what is coming up, and clicking an event opens that day in Google Calendar.
-- **Lock screen**: a live clock and a password field with dots on every monitor, drawn by a small
-  [xsecurelock](https://github.com/google/xsecurelock) module. PAM still checks the password, and
-  any error in the module switches back to the stock prompt.
+- **Lock screen**: a live clock, the Spotify track and a password field with dots on every
+  monitor, drawn by a small [xsecurelock](https://github.com/google/xsecurelock) module. PAM still
+  checks the password, and any error in the module switches back to the stock prompt.
 - **Launcher**: rofi in a Spotlight style with tabs for apps, windows, files, a calculator and emoji.
 - **Terminal**: Ghostty in Tokyo Night with JetBrains Mono. Tabs sit in the title bar with a + button
   and open in the current folder. A Starship prompt, fastfetch and btop use the same colors, and the

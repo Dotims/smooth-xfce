@@ -2,7 +2,7 @@
 # Renders ~/.cache/lock-bg.png from the current XFCE wallpaper: blurred and darkened. The clock,
 # avatar and password field are drawn live on top by lockscreen.py.
 import os, subprocess
-from PIL import Image, ImageFilter, ImageEnhance
+from PIL import Image, ImageFilter, ImageEnhance, ImageStat
 out = os.path.expanduser("~/.cache/lock-bg.png")
 keys = subprocess.run(["xfconf-query", "-c", "xfce4-desktop", "-l"], capture_output=True, text=True).stdout.split()
 key = next(k for k in keys if k.endswith("workspace0/last-image"))
@@ -13,8 +13,10 @@ im = Image.open(src).convert("RGB")
 s = max(W / im.width, H / im.height)
 im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
 im = im.crop(((im.width - W) // 2, (im.height - H) // 2, (im.width - W) // 2 + W, (im.height - H) // 2 + H))
-im = im.filter(ImageFilter.GaussianBlur(28))
-im = ImageEnhance.Brightness(im).enhance(0.62)
-im = Image.blend(im, Image.new("RGB", (W, H), (26, 27, 38)), 0.30)
+im = im.filter(ImageFilter.GaussianBlur(22))
+# darken to a fixed mean brightness: a dark wallpaper keeps its shapes, a bright one still lets the clock read
+mean = ImageStat.Stat(im.convert("L")).mean[0] or 1
+im = ImageEnhance.Brightness(im).enhance(min(0.95, max(0.45, 32 / mean)))
+im = Image.blend(im, Image.new("RGB", (W, H), (26, 27, 38)), 0.15)
 im.save(out)
 print(out)

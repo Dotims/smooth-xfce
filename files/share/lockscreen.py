@@ -11,6 +11,7 @@ import datetime as dt
 import getpass
 import math
 import os
+import pwd
 import signal
 import subprocess
 import sys
@@ -146,10 +147,32 @@ def find_monitors(randr, w, h):
     return sorted(out) or [(0, 0, w, h)]
 
 
+def now_playing():
+    """Spotify's track as one line for under the date, or None."""
+    try:
+        out = subprocess.run(['playerctl', '-p', 'spotify', 'metadata', '--format',
+                              '{{status}}\t{{title}}\t{{artist}}'],
+                             capture_output=True, text=True, timeout=0.5).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return None
+    parts = out.split('\t')
+    if len(parts) != 3 or not parts[1]:
+        return None
+    status, title, artist = parts
+    line = f'{title} · {artist}' if artist else title
+    if len(line) > 64:
+        line = line[:63] + '…'
+    return ('♪  ' if status == 'Playing' else '⏸  ') + line
+
+
 class LockScreen:
     def __init__(self, auth):
         self.auth = auth
         self.user = getpass.getuser()
+        # the full name from passwd, or the login with a capital letter
+        gecos = pwd.getpwuid(os.getuid()).pw_gecos.split(',')[0].strip()
+        self.name = gecos or self.user.capitalize()
+        self.track = now_playing()
         self.chars = []
         self.state = 'idle'        # idle, typing, checking, wrong
         self.message = None        # (text, rgb) under the pill
@@ -232,7 +255,9 @@ class LockScreen:
         top = h * 0.17
         top += text(cr, now.strftime('%H:%M'), 'Inter Display SemiBold', 128 * s, (*FG, 0.96), cx, top)
         date = f'{WEEKDAYS[now.weekday()]}, {now.day} {MONTHS[now.month - 1]}'
-        text(cr, date, 'Inter Medium', 22 * s, (*FG_DIM, 0.9), cx, top - 6 * s)
+        top += text(cr, date, 'Inter Medium', 22 * s, (*FG_DIM, 0.9), cx, top - 6 * s)
+        if self.track:
+            text(cr, self.track, 'Inter Medium', 15 * s, (*FG_DIM, 0.62), cx, top + 10 * s)
 
         # avatar: initial on the accent gradient
         r = 44 * s
@@ -243,10 +268,10 @@ class LockScreen:
         cr.arc(cx, ay, r, 0, 2 * math.pi)
         cr.set_source(grad)
         cr.fill()
-        initial = self.user[:1].upper()
+        initial = self.name[:1].upper()
         text(cr, initial, 'Inter SemiBold', 40 * s, (*NAVY, 1), cx, ay - 25 * s)
         ny = ay + r + 14 * s
-        ny += text(cr, self.user, 'Inter SemiBold', 20 * s, (*FG, 1), cx, ny)
+        ny += text(cr, self.name, 'Inter SemiBold', 20 * s, (*FG, 1), cx, ny)
 
         # password pill
         pw, ph = 264 * s, 40 * s
@@ -330,6 +355,8 @@ class LockScreen:
     def tick(self):
         if self.auth:
             self.follow_monitors()
+        if int(time.time()) % 5 == 0:
+            self.track = now_playing()
         self.area.queue_draw()
         if self.auth and time.monotonic() - self.last_key > IDLE_EXIT and self.state != 'checking':
             self.quit(EXIT_FAIL)

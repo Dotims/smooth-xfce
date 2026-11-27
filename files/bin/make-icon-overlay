@@ -1,0 +1,25 @@
+#!/bin/sh
+# WhiteSur-dark draws folders as white outlines below 32 px; this overlay theme reuses its colored
+# scalable folders at 16-24 px (list views, sidebars) and inherits everything else.
+# Usage: make-icon-overlay <icons dir>   (the dir that holds WhiteSur-dark)
+set -e
+D=${1:-$HOME/.local/share/icons}; B="$D/WhiteSur-dark"; O="$D/WhiteSur-Night"
+[ -d "$B/places/scalable" ] || { echo "no WhiteSur-dark in $D" >&2; exit 1; }
+rm -rf "$O"; mkdir -p "$O"
+dirs=""
+for s in 16 22 24; do
+  mkdir -p "$O/places/$s"
+  for f in "$B"/places/scalable/folder*.svg "$B"/places/scalable/user-*.svg "$B"/places/scalable/inode-directory.svg; do
+    [ -e "$f" ] && ln -s "../../../WhiteSur-dark/places/scalable/${f##*/}" "$O/places/$s/${f##*/}"
+  done
+  # the trash keeps its outline: a full-colour bin at 16 px reads as a blob
+  rm -f "$O/places/$s"/user-trash*.svg
+  dirs="$dirs${dirs:+,}places/$s"
+done
+{
+  printf '[Icon Theme]\nName=WhiteSur-Night\nComment=WhiteSur-dark with colored folders at small sizes\n'
+  printf 'Inherits=WhiteSur-dark,hicolor\nDirectories=%s\n' "$dirs"
+  for s in 16 22 24; do printf '\n[places/%s]\nSize=%s\nContext=Places\nType=Fixed\n' "$s" "$s"; done
+} > "$O/index.theme"
+gtk-update-icon-cache -q "$O" 2>/dev/null || true
+echo "$O"
