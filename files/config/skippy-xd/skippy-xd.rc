@@ -91,7 +91,7 @@ upscaleWindows = false
 animationDuration = 180
 
 # Animation refresh rate in fps
-animationRefresh = 165
+animationRefresh = 120
 
 # Background when skippy-xd is activated
 # To display background wallpaper:
