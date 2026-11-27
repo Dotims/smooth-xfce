@@ -1,14 +1,52 @@
 #!/bin/bash
-# genmon: current Spotify track in the panel; click toggles play/pause, empty when Spotify is off.
-# a fixed 300 px slot keeps the centred dock still when the title changes or Spotify quits
-slot='.genmon_valuebutton { min-width: 300px; padding: 0 10px; border-radius: 10px; }'
-st=$(playerctl -p spotify status 2>/dev/null) || { echo "<txt></txt><css>$slot</css>"; exit; }
-t=$(playerctl -p spotify metadata title 2>/dev/null); a=$(playerctl -p spotify metadata artist 2>/dev/null)
+# genmon: Spotify cover, title and artist in the panel; click toggles play/pause, empty when Spotify is off.
+# The slot keeps one width (SLOT) so the centred dock stays still when the title changes or Spotify quits.
+C=${XDG_CACHE_HOME:-$HOME/.cache}/desktop-look/now-playing
+ART=$HOME/.local/share/desktop-look/now_playing_art.py
+SLOT=251  # px of text plus the filler after it
+IFS=$'\x1f' read -r st id url t a < <(playerctl -p spotify metadata \
+  --format $'{{status}}\x1f{{mpris:trackid}}\x1f{{mpris:artUrl}}\x1f{{xesam:title}}\x1f{{xesam:artist}}' 2>/dev/null)
+if [ -z "$st" ] || [ "$st" = Stopped ]; then
+  echo "<txt></txt><css>.genmon_value { min-width: $((SLOT + 66))px; }</css>"; exit
+fi
+
+key=${id##*/}; [ -n "$key" ] || key=$(printf '%s' "$t$a" | md5sum | cut -c1-16)
+key=${key//[^A-Za-z0-9]/}
+# a new track: the helper measures the text now and fetches the cover in the background
+lock=$(stat -c %Y "$C/$key.lock" 2>/dev/null || echo 0)
+if [ ! -e "$C/$key.txt" ] || { [ ! -e "$C/$key.png" ] && (( $(printf '%(%s)T' -1) - lock > 60 )); }; then
+  mkdir -p "$C" && touch "$C/$key.lock"
+  python3 "$ART" "$C" "$key" "$url" "$t" "$a" </dev/null >/dev/null 2>&1
+  for _ in 1 2 3 4 5 6; do [ -e "$C/$key.png" ] && break; sleep 0.1; done
+fi
+{ read -r w; IFS= read -r l1; IFS= read -r l2; } 2>/dev/null < "$C/$key.txt"
+[ -n "$l1" ] || { w=120; l1="<span font='Inter SemiBold 10' foreground='#c0caf5'>Spotify</span>"; l2=; }
+
+img=$C/$key.png; [ -e "$img" ] && art=1 || { img=$C/placeholder.png; art=0; }
+[ -e "$img" ] && echo "<img>$img</img><click>playerctl -p spotify play-pause</click>"
+echo "<txt>$l1
+$l2</txt><txtclick>playerctl -p spotify play-pause</txtclick>"
+
+# The text button is as wide as the text; an invisible progress bar after it takes the rest of the
+# slot. Paused: the cover shrinks and everything dims. A new track (or its cover arriving) fades in;
+# the animation name changes with it, so GTK starts it once and not on every refresh.
+fill=$((SLOT - w)); (( fill < 0 )) && fill=0
+if [ "$st" = Playing ]; then op=1; sc=none; else op=0.5; sc='scale(0.82)'; fi
+n=np$(printf '%s' "$key" | cksum | cut -d' ' -f1)
+echo "<bar>0</bar>"
+echo "<css>
+.genmon_progressbar { min-width: ${fill}px; opacity: 0; }
+.genmon_progressbar trough, .genmon_progressbar progress { min-width: 0; min-height: 0; padding: 0;
+  margin: 0; border: none; background: none; box-shadow: none; }
+.genmon_valuebutton { opacity: $op; transition: opacity 280ms ease-out; animation: $n 380ms ease-out; }
+.genmon_imagebutton image { opacity: $op; -gtk-icon-transform: $sc;
+  transition: opacity 280ms ease-out, -gtk-icon-transform 320ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  animation: ${n}s$art 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2), ${n}f$art 300ms ease-out; }
+.genmon_imagebutton:hover image { -gtk-icon-transform: scale(1.08); }
+.genmon_imagebutton:active image { -gtk-icon-transform: scale(0.9); transition: -gtk-icon-transform 70ms ease-out; }
+@keyframes $n { from { opacity: 0; } to { opacity: $op; } }
+@keyframes ${n}s$art { from { -gtk-icon-transform: scale(0.6); } to { -gtk-icon-transform: $sc; } }
+@keyframes ${n}f$art { from { opacity: 0; } to { opacity: $op; } }
+</css>"
 esc() { sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'; }
-line="$t · $a"; [ ${#line} -gt 42 ] && line="${line:0:41}…"
-line=$(printf '%s' "$line" | esc)
-if [ "$st" = Playing ]; then icon="♪"; color="#c0caf5"; else icon="⏸"; color="#7a83ad"; fi
-echo "<txt><span font='Inter Medium 10' foreground='$color'>$icon  $line</span></txt>"
-echo "<txtclick>playerctl -p spotify play-pause</txtclick>"
-echo "<css>$slot .genmon_valuebutton { background-color: rgba(255, 255, 255, 0.05); }</css>"
 printf '<tool>%s\n%s\n\nClick: pause / play. Next and previous: media keys.</tool>\n' "$(printf '%s' "$t" | esc)" "$(printf '%s' "$a" | esc)"
