@@ -9,12 +9,15 @@ import codecs
 import ctypes
 import datetime as dt
 import getpass
+import hashlib
+import hmac
 import math
 import os
 import pwd
 import signal
 import subprocess
 import sys
+import threading
 import time
 import traceback
 
@@ -40,7 +43,13 @@ except Exception:
 EXIT_OK, EXIT_FAIL = 0, 1
 BG = os.path.expanduser('~/.cache/lock-bg.png')
 AUTHPROTO = os.environ.get('XSECURELOCK_AUTHPROTO') or '/usr/lib/xsecurelock/authproto_pam'
-IDLE_EXIT = 60  # seconds without a key before the prompt gives up
+IDLE_EXIT = 120  # seconds without a key before the prompt gives up (a restart costs ~0.2 s)
+STATE = os.path.join(os.environ.get('XDG_STATE_HOME') or os.path.expanduser('~/.local/state'), 'desktop-look')
+# length + scrypt of the password from the last unlock PAM accepted: typing it unlocks without Enter,
+# and a wrong guess never reaches PAM, so it cannot count towards faillock's lockout
+UNLOCK_KEY = os.path.join(STATE, 'unlock-key')
+TRACK_CACHE = os.path.join(STATE, 'lock-track')  # the saver's last line, so the prompt starts with it
+SCRYPT = dict(n=2 ** 14, r=8, p=1, maxmem=64 * 1024 * 1024, dklen=32)
 
 MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
           'October', 'November', 'December']
@@ -147,6 +156,25 @@ def find_monitors(randr, w, h):
     return sorted(out) or [(0, 0, w, h)]
 
 
+def load_key():
+    try:
+        n, salt, digest = open(UNLOCK_KEY).read().split()
+        return int(n), bytes.fromhex(salt), bytes.fromhex(digest)
+    except (OSError, ValueError):
+        return None
+
+
+def key_digest(pw, salt):
+    return hashlib.scrypt(pw, salt=salt, **SCRYPT)
+
+
+def write_private(path, data):
+    os.makedirs(os.path.dirname(path), mode=0o700, exist_ok=True)
+    with open(os.open(path + '.part', os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600), 'w') as f:
+        f.write(data)
+    os.replace(path + '.part', path)
+
+
 def now_playing():
     """Spotify's track as one line for under the date, or None."""
     try:
@@ -172,7 +200,10 @@ class LockScreen:
         # the full name from passwd, or the login with a capital letter
         gecos = pwd.getpwuid(os.getuid()).pw_gecos.split(',')[0].strip()
         self.name = gecos or self.user.capitalize()
-        self.track = now_playing()
+        try:
+            self.track = open(TRACK_CACHE).read().strip() or None
+        except OSError:
+            self.track = None
         self.chars = []
         self.state = 'idle'        # idle, typing, checking, wrong
         self.message = None        # (text, rgb) under the pill
@@ -201,6 +232,8 @@ class LockScreen:
         self.win.realize()
         # the first frame as the X background, so mapping never shows black before GTK draws
         self.first = cairo.ImageSurface(cairo.FORMAT_RGB24, w, h)
+        if auth:
+            self.early_input()
         self.draw(None, cairo.Context(self.first))
         self.first_pattern = cairo.SurfacePattern(self.first)
         self.win.get_window().set_background_pattern(self.first_pattern)
@@ -213,6 +246,7 @@ class LockScreen:
             parent.show()
 
         GLib.timeout_add(1000 - int(time.time() * 1000) % 1000 + 5, self.tick)
+        GLib.idle_add(lambda: (self.refresh_track(), False)[1])
         for sig in (signal.SIGTERM, signal.SIGINT):
             GLib.unix_signal_add(GLib.PRIORITY_HIGH, sig, self.quit, EXIT_FAIL if auth else EXIT_OK)
         GLib.unix_signal_add(GLib.PRIORITY_HIGH, signal.SIGUSR1, lambda: True)
@@ -330,7 +364,12 @@ class LockScreen:
         elif self.caps_lock():
             text(cr, 'Caps Lock is on', 'Inter Medium', 14 * s, (*AMBER, 1), cx, my)
 
-        hint = 'Enter unlocks · Esc cancels' if self.auth else 'Start typing to unlock'
+        if not self.auth:
+            hint = 'Start typing to unlock'
+        elif getattr(self, 'unlock_key', None):
+            hint = 'Unlocks as soon as the password is complete · Esc cancels'
+        else:
+            hint = 'Enter unlocks · Esc cancels'
         text(cr, hint, 'Inter', 13 * s, (*FG_DIM, 0.55), cx, h - 64 * s)
 
     def caps_lock(self):
@@ -356,11 +395,29 @@ class LockScreen:
         if self.auth:
             self.follow_monitors()
         if int(time.time()) % 5 == 0:
-            self.track = now_playing()
+            self.refresh_track()
         self.area.queue_draw()
         if self.auth and time.monotonic() - self.last_key > IDLE_EXIT and self.state != 'checking':
             self.quit(EXIT_FAIL)
         GLib.timeout_add(1000 - int(time.time() * 1000) % 1000 + 5, self.tick)
+        return False
+
+    def refresh_track(self):
+        # playerctl can take a while when Spotify is busy, so it never runs on the drawing thread
+        def work():
+            track = now_playing()
+            GLib.idle_add(self.set_track, track)
+        threading.Thread(target=work, daemon=True).start()
+
+    def set_track(self, track):
+        if track != self.track:
+            self.track = track
+            self.area.queue_draw()
+            if not self.auth:
+                try:
+                    write_private(TRACK_CACHE, track or '')
+                except OSError:
+                    pass
         return False
 
     def animate(self, seconds):
@@ -376,27 +433,48 @@ class LockScreen:
         if self.auth:
             self.parent.hide()
             Gdk.Display.get_default().flush()
-        Gtk.main_quit()
+        if Gtk.main_level():
+            Gtk.main_quit()
+        else:  # Esc typed before the main loop started
+            GLib.idle_add(Gtk.main_quit)
         return False
 
 
 class Auth(LockScreen):
     def __init__(self):
-        super().__init__(auth=True)
+        # all set before the first frame, which already takes the keys typed while starting up
+        self.unlock_key = load_key()
         self.code = EXIT_FAIL
         self.decoder = codecs.getincrementaldecoder('utf-8')(errors='ignore')
         self.proto = None
         self.inbuf = b''
         self.prompted = False
         self.submitted = False
+        self.sent = False
+        self.pending_key = None
         os.set_blocking(0, False)
+        super().__init__(auth=True)
         GLib.io_add_watch(0, GLib.PRIORITY_DEFAULT, GLib.IO_IN | GLib.IO_HUP | GLib.IO_ERR, self.on_stdin)
         self.start_proto()
+
+    def early_input(self):
+        # xsecurelock starts this process on the first key and keeps writing keys into the pipe
+        try:
+            data = os.read(0, 4096)
+        except (BlockingIOError, InterruptedError):
+            return
+        if not data:
+            self.cancel()
+            return
+        self.last_key = time.monotonic()
+        for ch in self.decoder.decode(data):
+            self.key(ch)
 
     def start_proto(self):
         self.proto = subprocess.Popen([AUTHPROTO], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         self.inbuf = b''
         self.prompted = False
+        self.sent = False
         os.set_blocking(self.proto.stdout.fileno(), False)
         GLib.io_add_watch(self.proto.stdout.fileno(), GLib.PRIORITY_DEFAULT,
                           GLib.IO_IN | GLib.IO_HUP | GLib.IO_ERR, self.on_proto, self.proto)
@@ -430,14 +508,32 @@ class Auth(LockScreen):
             self.cancel()
         elif ch in ('\r', '\n'):
             if self.chars:
-                self.submitted = True
-                self.state = 'checking'
-                self.animate(0)
-                self.send_password()
+                self.submit()
         elif ch >= ' ':
             self.chars.append(ch)
+            if self.unlock_key and len(self.chars) == self.unlock_key[0] and self.matches():
+                self.submit()
         if self.state != 'checking':
             self.state = 'typing' if self.chars else 'idle'
+
+    def matches(self):
+        _, salt, digest = self.unlock_key
+        try:
+            return hmac.compare_digest(key_digest(''.join(self.chars).encode(), salt), digest)
+        except (ValueError, MemoryError):
+            return False
+
+    def submit(self):
+        # the digest of what is sent is kept until PAM answers, then stored only if it was right
+        salt = os.urandom(16)
+        try:
+            self.pending_key = (len(self.chars), salt, key_digest(''.join(self.chars).encode(), salt))
+        except (ValueError, MemoryError):
+            self.pending_key = None
+        self.submitted = True
+        self.state = 'checking'
+        self.animate(0)
+        self.send_password()
 
     def send_password(self):
         if not (self.prompted and self.submitted):
@@ -453,6 +549,7 @@ class Auth(LockScreen):
         for buf in (pw, packet):
             buf[:] = bytes(len(buf))
         self.prompted = self.submitted = False
+        self.sent = True
 
     # authproto packets: "<type> <len>\n<message>\n"
     def on_proto(self, fd, cond, proto):
@@ -481,8 +578,9 @@ class Auth(LockScreen):
 
     def packet(self, kind, msg):
         if kind in ('P', 'U'):
-            # authproto_pam retries a wrong password itself: a new prompt after ours means "wrong"
-            if self.state == 'checking':
+            # authproto_pam retries a wrong password itself: a new prompt after one we sent means
+            # "wrong"; the first prompt can also arrive after Enter, while the password still waits
+            if self.state == 'checking' and self.sent:
                 self.wrong()
             self.prompted = True
             self.send_password()
@@ -496,6 +594,12 @@ class Auth(LockScreen):
     def finished(self, proto):
         rc = proto.wait()
         if rc == 0:
+            if self.pending_key:
+                n, salt, digest = self.pending_key
+                try:
+                    write_private(UNLOCK_KEY, f'{n} {salt.hex()} {digest.hex()}\n')
+                except OSError:
+                    pass
             self.quit(EXIT_OK)
             return
         if self.state == 'checking':
@@ -506,6 +610,7 @@ class Auth(LockScreen):
         self.state = 'wrong'
         self.chars.clear()
         self.submitted = False
+        self.pending_key = None
         if not self.message or self.message[1] != RED:
             self.message = ('Wrong password, try again', RED)
         self.shake_start = time.monotonic()

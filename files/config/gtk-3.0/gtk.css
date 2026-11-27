@@ -561,3 +561,30 @@ window.xfce4-panel {
 /* hover fills fade in and out instead of snapping (dock tiles, clock, status and music buttons) */
 #XfcePanelWindow button,
 #docklike-plugin button { transition: background-color 160ms ease-out; }
+
+/* dock window list (hover a running app): the panel's glass, rounded rows, a quiet close button */
+.xfce-docklike-window,
+.xfce-docklike-window .menu {
+  background-color: rgba(26, 27, 38, 0.96);
+  border-width: 0;
+}
+.xfce-docklike-window .menu { padding: 6px; }
+.xfce-docklike-window .menu_item { border-radius: 9px; transition: background-color 140ms ease-out; }
+.xfce-docklike-window .menu_item grid { padding: 6px 6px 6px 10px; }
+.xfce-docklike-window .hover_menu_item { background-color: rgba(255, 255, 255, 0.07); }
+.xfce-docklike-window .menu_item label { color: #c0caf5; font-size: 10pt; }
+.xfce-docklike-window .menu_item button {
+  -gtk-icon-style: symbolic;
+  color: #737aa2;
+  background-color: transparent;
+  background-image: none;
+  border-width: 0;
+  box-shadow: none;
+  border-radius: 99px;
+  min-width: 22px;
+  min-height: 22px;
+  padding: 2px;
+  transition: background-color 140ms ease-out, color 140ms ease-out;
+}
+.xfce-docklike-window .menu_item button:hover { color: #f7768e; background-color: rgba(247, 118, 142, 0.16); }
+.xfce-docklike-window .menu_item .preview { margin: 4px 0 2px; border-radius: 6px; }

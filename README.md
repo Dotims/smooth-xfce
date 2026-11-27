@@ -23,7 +23,7 @@ screen, all in the Tokyo Night palette.
   blur, shadows, rounded corners and open/close animations. On an NVIDIA desktop the driver's
   composition pipeline is on, so a dragged browser tab keeps up with the mouse.
 - **Panel**: a rounded glass bar floating above the screen edge. The dock sits in the middle with
-  the Arch menu button and dot indicators, the Spotify track on the left, the tray, one status
+  the Arch menu button and dot indicators (hovering a running app shows its windows as thumbnails), the Spotify track on the left, the tray, one status
   button for Wi-Fi, Bluetooth, volume and battery and the clock on the right.
 - **Quick settings**: click the status button. Tiles for Wi-Fi, Bluetooth, do not disturb and
   night light, network and device lists, sliders for volume (with the output picker and a per-app
@@ -35,7 +35,9 @@ screen, all in the Tokyo Night palette.
   and what is coming up, and clicking an event opens that day in Google Calendar.
 - **Lock screen**: a live clock, the Spotify track and a password field with dots on every
   monitor, drawn by a small [xsecurelock](https://github.com/google/xsecurelock) module. PAM still
-  checks the password, and any error in the module switches back to the stock prompt.
+  checks the password, and any error in the module switches back to the stock prompt. After one
+  unlock with Enter it keeps the password's length and an scrypt digest (`~/.local/state`, 600), so
+  the right password unlocks as soon as it is typed and a wrong one never counts as a PAM attempt.
 - **Launcher**: rofi in a Spotlight style with tabs for apps, windows, files, a calculator and emoji.
 - **Terminal**: Ghostty in Tokyo Night with JetBrains Mono. Tabs sit in the title bar with a + button
   and open in the current folder. A Starship prompt, fastfetch and btop use the same colors, and the

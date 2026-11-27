@@ -2,7 +2,8 @@
 pinned=vesktop;google-chrome;spotify;antigravity;code;brave-browser;thunar;firefox;slack;signal;com.mitchellh.ghostty;arctis-eq;
 middleButtonBehavior=1
 onlyDisplayScreen=false
-showPreviews=false
+showPreviews=true
+previewScale=0.22
 showWindowCount=true
 indicatorStyle=1
 indicatorColorFromTheme=false
